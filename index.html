@@ -17,7 +17,6 @@
     --blocked-bg: #fee2e2; --blocked-border: #fca5a5; --blocked-text: #dc2626;
     --review-bg: #e0e7ff; --review-border: #a5b4fc; --review-text: #4338ca;
     --none-bg: #f0f1f4; --none-border: #dde0e5; --none-text: #a0a8b4;
-    --loop-bg: #fdf4ff; --loop-border: #e879f9; --loop-text: #a21caf;
   }
   [data-theme="dark"] {
     --bg: #0d0d1a; --bgCard: #111128; --border: #1e1e3a; --borderStrong: #2a2a5a;
@@ -28,7 +27,6 @@
     --blocked-bg: #3b1010; --blocked-border: #7a2020; --blocked-text: #f87171;
     --review-bg: #1a1a40; --review-border: #3535a0; --review-text: #818cf8;
     --none-bg: #1a1a2e; --none-border: #2a2a4a; --none-text: #556677;
-    --loop-bg: #2a0a2e; --loop-border: #a21caf; --loop-text: #e879f9;
   }
 
   body { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; }
@@ -66,38 +64,14 @@
   .legend { display: flex; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 5px; }
   .legend-swatch { width: 11px; height: 11px; border-radius: 2px; }
-  table { border-collapse: collapse; width: 100%; table-layout: fixed; }
-  th { padding: 10px 12px; border-bottom: 2px solid var(--border); color: var(--textMuted); font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; text-align: center; position: relative; overflow: hidden; }
-  th.left { text-align: left; }
-  td { padding: 5px 10px; border-bottom: 1px solid var(--border); font-size: 12px; overflow: hidden; }
-  td.step-main { font-weight: 700; color: var(--textStrong); background: var(--bgCard); cursor: pointer; user-select: none; }
+  table { border-collapse: collapse; width: 100%; min-width: 600px; }
+  th { padding: 10px 12px; border-bottom: 2px solid var(--border); color: var(--textMuted); font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; text-align: center; }
+  th.left { text-align: left; min-width: 220px; }
+  td { padding: 5px 10px; border-bottom: 1px solid var(--border); font-size: 12px; }
+  td.step-main { font-weight: 700; color: var(--textStrong); background: var(--bgCard); }
   td.step-sub { padding-left: 26px; color: var(--textMuted); font-size: 11px; }
   td.cell { text-align: center; position: relative; cursor: pointer; }
   td.cell-main { text-align: center; background: var(--bgCard); }
-
-  /* Collapsed rows */
-  tr.collapsed-row { display: none; }
-
-  /* Collapse toggle */
-  .collapse-btn { background: none; border: none; cursor: pointer; color: var(--textMuted); font-size: 10px; padding: 0 3px; transition: transform .2s; flex-shrink: 0; line-height: 1; }
-  .collapse-btn.open { transform: rotate(0deg); }
-  .collapse-btn.closed { transform: rotate(-90deg); }
-
-  /* Column resize handle */
-  .resize-handle {
-    position: absolute; top: 0; right: 0; width: 6px; height: 100%;
-    cursor: col-resize; z-index: 10;
-    background: transparent;
-    transition: background .15s;
-  }
-  .resize-handle:hover, .resize-handle.dragging { background: var(--review-border); }
-
-  /* Inline rename input */
-  .rename-input {
-    background: var(--bg); border: 1px solid var(--review-border); border-radius: 3px;
-    color: var(--textStrong); font-family: inherit; font-size: 11px; font-weight: 700;
-    padding: 1px 5px; outline: none; width: 100%; min-width: 60px;
-  }
 
   /* Cell chips */
   .chip { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 600; }
@@ -105,11 +79,6 @@
   .chip.active { background: var(--active-bg); border: 1px solid var(--active-border); color: var(--active-text); }
   .chip.blocked { background: var(--blocked-bg); border: 1px solid var(--blocked-border); color: var(--blocked-text); }
   .chip.review { background: var(--review-bg); border: 1px solid var(--review-border); color: var(--review-text); }
-
-  /* Loop chips — stacked in cell */
-  .cell-stack { display: flex; flex-direction: column; gap: 2px; align-items: center; }
-  .loop-row { display: flex; align-items: center; gap: 3px; }
-  .loop-badge { font-size: 8px; color: var(--loop-text); border: 1px solid var(--loop-border); border-radius: 2px; padding: 0 3px; background: var(--loop-bg); }
 
   /* Dot */
   .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
@@ -120,20 +89,12 @@
 
   /* Popup */
   .popup-overlay { position: fixed; inset: 0; z-index: 99; }
-  .popup { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: var(--popBg); border: 1px solid var(--borderStrong); border-radius: 8px; padding: 10px; z-index: 100; min-width: 180px; box-shadow: 0 8px 28px var(--shadow); }
-  .popup-label { font-size: 9px; color: var(--textMuted); letter-spacing: 1px; margin-bottom: 5px; text-transform: uppercase; }
+  .popup { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: var(--popBg); border: 1px solid var(--borderStrong); border-radius: 8px; padding: 10px; z-index: 100; min-width: 170px; box-shadow: 0 8px 28px var(--shadow); }
+  .popup-label { font-size: 9px; color: var(--textMuted); letter-spacing: 1px; margin-bottom: 5px; }
   .popup-btn { display: block; width: 100%; padding: 4px 8px; background: transparent; border: 1px solid var(--border); border-radius: 3px; cursor: pointer; font-size: 11px; font-family: inherit; text-align: left; margin-bottom: 2px; }
   .popup-btn.selected { border-color: var(--borderStrong); }
   .popup-person { padding: 2px 7px; background: transparent; border: 1px solid var(--borderStrong); border-radius: 3px; cursor: pointer; font-size: 10px; font-family: inherit; }
   .popup-person.selected { background: var(--accent); color: var(--textStrong); }
-  .popup-loop-btn { display: block; width: 100%; padding: 4px 8px; background: var(--loop-bg); border: 1px solid var(--loop-border); border-radius: 3px; cursor: pointer; font-size: 10px; font-family: inherit; color: var(--loop-text); font-weight: 600; margin-top: 6px; text-align: left; }
-  .popup-loop-remove { background: none; border: none; cursor: pointer; color: var(--blocked-text); font-size: 9px; font-family: inherit; padding: 0 2px; }
-  .popup-section-title { font-size: 9px; color: var(--loop-text); letter-spacing: 1px; margin: 6px 0 3px; text-transform: uppercase; border-top: 1px solid var(--border); padding-top: 5px; }
-
-  /* Name suggestion dropdown */
-  .suggest-list { position: absolute; background: var(--popBg); border: 1px solid var(--borderStrong); border-radius: 5px; z-index: 500; min-width: 160px; box-shadow: 0 4px 16px var(--shadow); }
-  .suggest-item { padding: 5px 10px; cursor: pointer; font-size: 11px; color: var(--text); }
-  .suggest-item:hover { background: var(--accent); color: var(--textStrong); }
 
   /* Modal */
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; z-index: 1000; }
@@ -182,6 +143,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
+// ╔══════════════════════════════════════════════════════════╗
+// ║  HIER DEINE FIREBASE CONFIG EINFÜGEN                    ║
+// ╚══════════════════════════════════════════════════════════╝
 const firebaseConfig = {
   apiKey: "AIzaSyDrLP5LF4OmjAkyn6O0o8d6bLqu0VqtDfs",
   authDomain: "lop-tool.firebaseapp.com",
@@ -218,22 +182,21 @@ let state = {
   steps: DEFAULT_STEPS,
   constructions: DEFAULT_CONSTRUCTIONS,
   team: DEFAULT_TEAM,
-  matrix: {},        // key: cid::sid → { status, person, loops:[{status,person}] }
+  matrix: {},
   view: "matrix",
   theme: "light",
   editMode: false,
-  activeCell: null,  // "cid::sid" or "cid::sid::L0" for loop index
+  activeCell: null,
   saving: false,
-  colWidths: {},     // sid → pixel width override
-  collapsedSteps: {},// stepId → bool
-  renaming: null,    // { type:"con"|"step"|"sub", id, parentId? }
 };
 
 let saveTimeout = null;
 let unsubscribe = null;
 
 // ─── Firebase Sync ───
-function docRef() { return db.collection("tracker").doc("shared"); }
+function docRef() {
+  return db.collection("tracker").doc("shared");
+}
 
 function loadData() {
   if (unsubscribe) unsubscribe();
@@ -244,8 +207,6 @@ function loadData() {
       if (d.constructions) state.constructions = d.constructions;
       if (d.team) state.team = d.team;
       if (d.matrix) state.matrix = d.matrix;
-      if (d.colWidths) state.colWidths = d.colWidths;
-      if (d.collapsedSteps) state.collapsedSteps = d.collapsedSteps;
       render();
     }
   });
@@ -261,8 +222,6 @@ function saveData() {
         constructions: state.constructions,
         team: state.team,
         matrix: state.matrix,
-        colWidths: state.colWidths,
-        collapsedSteps: state.collapsedSteps,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedBy: state.user?.displayName || "unknown",
       }, { merge: true });
@@ -280,7 +239,7 @@ function getAllIds(steps) {
   return ids;
 }
 function ck(cid,sid) { return cid+"::"+sid; }
-function getCell(cid,sid) { return state.matrix[ck(cid,sid)] || {status:"none",person:"",loops:[]}; }
+function getCell(cid,sid) { return state.matrix[ck(cid,sid)] || {status:"none",person:""}; }
 function setCell(cid,sid,d) { state.matrix[ck(cid,sid)]=d; state.activeCell=null; saveData(); render(); }
 function getProgress(cid) {
   const ids=getAllIds(state.steps), t=ids.length;
@@ -293,47 +252,6 @@ function findName(sid) {
   for(const s of state.steps){ if(s.id===sid)return s.name; for(const ss of(s.substeps||[]))if(ss.id===sid)return s.name+" → "+ss.name; }
   return sid;
 }
-
-// Suggest next construction name based on existing names
-function suggestNextName(partial) {
-  if(!partial || partial.length < 1) return [];
-  const existing = state.constructions.map(c => c.name);
-  // Find names that share prefix pattern (e.g. "NM " prefix)
-  const parts = partial.trim().split(/\s+/);
-  const prefix = parts.length > 1 ? parts.slice(0,-1).join(" ")+" " : parts[0].replace(/\d+$/,"");
-  const matches = existing
-    .filter(n => n.toLowerCase().startsWith(prefix.toLowerCase()) && n !== partial)
-    .concat(existing.filter(n => n.toLowerCase().includes(partial.toLowerCase()) && n !== partial))
-    .filter((v,i,a)=>a.indexOf(v)===i)
-    .slice(0,6);
-  return matches;
-}
-
-// ─── Column Resize ───
-let resizeDrag = null;
-function startResize(e, colId) {
-  e.preventDefault(); e.stopPropagation();
-  const startX = e.clientX;
-  const startW = state.colWidths[colId] || 95;
-  resizeDrag = { colId, startX, startW };
-  document.body.style.cursor = "col-resize";
-  document.body.style.userSelect = "none";
-}
-document.addEventListener("mousemove", e => {
-  if(!resizeDrag) return;
-  const diff = e.clientX - resizeDrag.startX;
-  const newW = Math.max(60, resizeDrag.startW + diff);
-  state.colWidths[resizeDrag.colId] = newW;
-  // Update table cells live without full re-render
-  document.querySelectorAll(`[data-colid="${resizeDrag.colId}"]`).forEach(el => { el.style.width = newW+"px"; el.style.minWidth = newW+"px"; });
-});
-document.addEventListener("mouseup", () => {
-  if(!resizeDrag) return;
-  resizeDrag = null;
-  document.body.style.cursor = "";
-  document.body.style.userSelect = "";
-  saveData();
-});
 
 // ─── Render ───
 function h(tag,attrs,...children) {
@@ -359,12 +277,14 @@ function render() {
   else if (state.view==="dashboard") content.appendChild(renderDashboard());
   else if (state.view==="tasks") content.appendChild(renderTasks());
   app.appendChild(content);
+  // Save indicator
   const si = h("div",{className:"save-indicator"+(state.showSaved?" show":"")}, "✓ Gespeichert");
   app.appendChild(si);
 }
 
 function renderLogin() {
   return h("div",{className:"login-screen"},
+    h("div",{style:{width:"7px",height:"7px",borderRadius:"50%",background:"var(--done-text)",boxShadow:"0 0 6px var(--done-text)"}}),
     h("h1",null,"Konstruktion Tracker"),
     h("button",{className:"login-btn",onClick:()=>auth.signInWithPopup(provider)},
       h("span",null,"🔐"),
@@ -395,51 +315,6 @@ function renderHeader() {
   );
 }
 
-// ─── Inline rename ───
-function makeRenameInput(currentName, onSave) {
-  const inp = h("input",{
-    className:"rename-input",
-    value: currentName,
-    onClick: e => e.stopPropagation(),
-    onKeydown: e => {
-      if(e.key==="Enter"){ onSave(inp.value.trim()||currentName); }
-      if(e.key==="Escape"){ state.renaming=null; render(); }
-    },
-    onBlur: () => { onSave(inp.value.trim()||currentName); }
-  });
-  setTimeout(()=>{ try{ inp.focus(); inp.select(); }catch(e){} }, 30);
-  return inp;
-}
-
-// ─── Name suggestion input (for new construction) ───
-function makeNameInputWithSuggestion(onConfirm) {
-  const wrap = h("div",{style:{position:"relative",display:"inline-block"}});
-  const inp = h("input",{
-    className:"rename-input",
-    placeholder:"Name...",
-    style:{width:"120px"},
-    onInput: () => { updateSuggestions(); },
-    onKeydown: e => {
-      if(e.key==="Enter"){ const v=inp.value.trim(); if(v){ onConfirm(v); wrap.remove(); } }
-      if(e.key==="Escape"){ wrap.remove(); }
-    }
-  });
-  const sug = h("div",{className:"suggest-list",style:{display:"none",top:"100%",left:"0"}});
-  function updateSuggestions() {
-    const matches = suggestNextName(inp.value);
-    sug.innerHTML="";
-    if(!matches.length){ sug.style.display="none"; return; }
-    matches.forEach(m=>{
-      sug.appendChild(h("div",{className:"suggest-item",onClick:()=>{ inp.value=m; sug.style.display="none"; onConfirm(m); wrap.remove(); }},m));
-    });
-    sug.style.display="block";
-  }
-  wrap.appendChild(inp);
-  wrap.appendChild(sug);
-  setTimeout(()=>{ try{ inp.focus(); }catch(e){} }, 30);
-  return wrap;
-}
-
 function renderMatrix() {
   const frag = document.createDocumentFragment();
   // Legend
@@ -450,105 +325,40 @@ function renderMatrix() {
       h("span",{style:{color:"var(--"+k+"-text)",fontSize:"11px"}},STATUS_LABELS[k])
     ));
   });
-  legend.appendChild(h("div",{className:"legend-item"},
-    h("div",{className:"legend-swatch",style:{background:"var(--loop-bg)",border:"1px solid var(--loop-border)"}}),
-    h("span",{style:{color:"var(--loop-text)",fontSize:"11px"}},"Zusatzschleife")
-  ));
   frag.appendChild(legend);
 
+  // Table
   const wrapper = h("div",{style:{overflowX:"auto"}});
   const table = h("table",null);
-
-  // ── Header ──
+  // Header
   const thead = h("thead",null);
-  const hrow = h("tr",null);
-
-  // Step column
-  const stepColW = state.colWidths["__steps__"] || 220;
-  const thStep = h("th",{className:"left","data-colid":"__steps__",style:{width:stepColW+"px",minWidth:stepColW+"px"}}, "Prozessschritt");
-  const rh0 = h("div",{className:"resize-handle",onMousedown:e=>startResize(e,"__steps__")});
-  thStep.appendChild(rh0);
-  hrow.appendChild(thStep);
-
+  const hrow = h("tr",null, h("th",{className:"left"},"Prozessschritt"));
   state.constructions.forEach(con=>{
-    const w = state.colWidths[con.id] || 95;
-    const th = h("th",{"data-colid":con.id,style:{width:w+"px",minWidth:w+"px",position:"relative"}});
-
-    // Rename or display
-    if(state.renaming?.type==="con" && state.renaming.id===con.id) {
-      th.appendChild(makeRenameInput(con.name, newName=>{ con.name=newName; state.renaming=null; saveData(); render(); }));
-    } else {
-      const nameSpan = h("span",null, con.name);
-      if(state.editMode) {
-        nameSpan.style.cursor="pointer";
-        nameSpan.title="Klicken zum Umbenennen";
-        nameSpan.addEventListener("click", e=>{ e.stopPropagation(); state.renaming={type:"con",id:con.id}; render(); });
-      }
-      th.appendChild(nameSpan);
-      if(state.editMode) th.appendChild(h("button",{className:"btn-edit danger",style:{position:"absolute",top:"2px",right:"14px"},onClick:e=>{e.stopPropagation();state.constructions=state.constructions.filter(c=>c.id!==con.id);saveData();render();}},"✕"));
-    }
-
+    const th = h("th",{style:{minWidth:"95px",position:"relative"}});
+    th.appendChild(document.createTextNode(con.name));
+    if(state.editMode) th.appendChild(h("button",{className:"btn-edit danger",style:{position:"absolute",top:"2px",right:"2px"},onClick:()=>{state.constructions=state.constructions.filter(c=>c.id!==con.id);saveData();render();}},"✕"));
     const p = getProgress(con.id);
     const mini = h("div",{className:"mini-bar",style:{marginTop:"3px",justifyContent:"center"}},
       h("div",{className:"mini-track"}, h("div",{style:{height:"100%",width:p.pct+"%",background:p.pct===100?"var(--done-text)":"var(--active-text)"}})),
       h("span",{style:{fontSize:"9px",color:"var(--textMuted)"}},p.pct+"%")
     );
     th.appendChild(mini);
-
-    // Resize handle
-    const rh = h("div",{className:"resize-handle",onMousedown:e=>startResize(e,con.id)});
-    th.appendChild(rh);
     hrow.appendChild(th);
   });
-
-  if(state.editMode) {
-    const addTh = h("th",{style:{minWidth:"140px"}});
-    // Input with suggestion
-    const addWrap = makeNameInputWithSuggestion(name=>{
-      state.constructions.push({id:"c_"+uid(),name});
-      saveData(); render();
-    });
-    addTh.appendChild(addWrap);
-    hrow.appendChild(addTh);
-  }
-
+  if(state.editMode) hrow.appendChild(h("th",null,h("button",{className:"btn-sm",onClick:()=>{const name=prompt("Neue Konstruktion:"); if(name){state.constructions.push({id:"c_"+uid(),name});saveData();render();}}},"+ Konstr.")));
   thead.appendChild(hrow);
   table.appendChild(thead);
 
-  // ── Body ──
+  // Body
   const tbody = h("tbody",null);
-
   state.steps.forEach((step,si)=>{
     const hasSubs = step.substeps&&step.substeps.length>0;
-    const isCollapsed = !!state.collapsedSteps[step.id];
-
-    // ── Main step row ──
+    // Main row
     const tr = h("tr",null);
     const tdName = h("td",{className:"step-main"});
-    const nameDiv = h("div",{style:{display:"flex",alignItems:"center",gap:"4px"}});
-
-    // Collapse toggle (only if has substeps)
-    if(hasSubs) {
-      const colBtn = h("button",{
-        className:"collapse-btn "+(isCollapsed?"closed":"open"),
-        onClick: e => { e.stopPropagation(); state.collapsedSteps[step.id]=!isCollapsed; saveData(); render(); }
-      }, "▾");
-      nameDiv.appendChild(colBtn);
-    } else {
-      nameDiv.appendChild(h("span",{style:{width:"14px",flexShrink:"0"}}));
-    }
-
+    const nameDiv = h("div",{style:{display:"flex",alignItems:"center",gap:"5px"}});
     if(step.repeatable) nameDiv.appendChild(h("span",{className:"repeat-badge"},"↻"));
-
-    // Rename or label
-    if(state.renaming?.type==="step" && state.renaming.id===step.id) {
-      nameDiv.appendChild(makeRenameInput(step.name, newName=>{ step.name=newName; state.renaming=null; saveData(); render(); }));
-    } else {
-      const sn = h("span",{style:{flex:"1"}},step.name);
-      if(state.editMode){ sn.style.cursor="pointer"; sn.title="Klicken zum Umbenennen"; sn.addEventListener("click",e=>{e.stopPropagation();state.renaming={type:"step",id:step.id};render();}); }
-      nameDiv.appendChild(sn);
-    }
-
+    nameDiv.appendChild(h("span",{style:{flex:"1"}},step.name));
     if(state.editMode){
       const btns = h("span",{style:{display:"flex",gap:"1px"}});
       if(si>0) btns.appendChild(h("button",{className:"btn-edit",onClick:()=>{const s=state.steps,i=s.findIndex(x=>x.id===step.id);[s[i],s[i-1]]=[s[i-1],s[i]];saveData();render();}},"▲"));
@@ -567,31 +377,22 @@ function renderMatrix() {
         tr.appendChild(h("td",{className:"cell-main"}, st!=="none"?h("span",{className:"dot "+st}):document.createTextNode("")));
       } else {
         const cell=getCell(con.id,step.id);
-        const cellKey=ck(con.id,step.id);
-        const td=h("td",{className:"cell",onClick:()=>{state.activeCell=state.activeCell===cellKey?null:cellKey;render();}});
-        td.appendChild(renderCellContent(cell));
-        if(state.activeCell===cellKey) td.appendChild(renderPopup(con.id,step.id,cell));
+        const td=h("td",{className:"cell",onClick:()=>{state.activeCell=state.activeCell===ck(con.id,step.id)?null:ck(con.id,step.id);render();}});
+        td.appendChild(renderChip(cell));
+        if(state.activeCell===ck(con.id,step.id)) td.appendChild(renderPopup(con.id,step.id,cell));
         tr.appendChild(td);
       }
     });
     if(state.editMode) tr.appendChild(h("td",null));
     tbody.appendChild(tr);
 
-    // ── Substep rows ──
+    // Substep rows
     if(hasSubs) step.substeps.forEach((sub,ssi)=>{
-      const str = h("tr",{className:isCollapsed?"collapsed-row":""});
+      const str = h("tr",null);
       const stdName = h("td",{className:"step-sub"});
       const sdiv = h("div",{style:{display:"flex",alignItems:"center",gap:"3px"}});
       sdiv.appendChild(h("span",{className:"sub-arrow"},"└"));
-
-      if(state.renaming?.type==="sub" && state.renaming.id===sub.id) {
-        sdiv.appendChild(makeRenameInput(sub.name, newName=>{ sub.name=newName; state.renaming=null; saveData(); render(); }));
-      } else {
-        const ssn = h("span",{style:{flex:"1"}},sub.name);
-        if(state.editMode){ ssn.style.cursor="pointer"; ssn.title="Klicken zum Umbenennen"; ssn.addEventListener("click",e=>{e.stopPropagation();state.renaming={type:"sub",id:sub.id};render();}); }
-        sdiv.appendChild(ssn);
-      }
-
+      sdiv.appendChild(h("span",{style:{flex:"1"}},sub.name));
       if(state.editMode){
         const sbtns = h("span",{style:{display:"flex",gap:"1px"}});
         if(ssi>0) sbtns.appendChild(h("button",{className:"btn-edit",onClick:()=>{const ss=step.substeps;[ss[ssi],ss[ssi-1]]=[ss[ssi-1],ss[ssi]];saveData();render();}},"▲"));
@@ -601,13 +402,11 @@ function renderMatrix() {
       }
       stdName.appendChild(sdiv);
       str.appendChild(stdName);
-
       state.constructions.forEach(con=>{
         const cell=getCell(con.id,sub.id);
-        const cellKey=ck(con.id,sub.id);
-        const td=h("td",{className:"cell",onClick:()=>{state.activeCell=state.activeCell===cellKey?null:cellKey;render();}});
-        td.appendChild(renderCellContent(cell));
-        if(state.activeCell===cellKey) td.appendChild(renderPopup(con.id,sub.id,cell));
+        const td=h("td",{className:"cell",onClick:()=>{state.activeCell=state.activeCell===ck(con.id,sub.id)?null:ck(con.id,sub.id);render();}});
+        td.appendChild(renderChip(cell));
+        if(state.activeCell===ck(con.id,sub.id)) td.appendChild(renderPopup(con.id,sub.id,cell));
         str.appendChild(td);
       });
       if(state.editMode) str.appendChild(h("td",null));
@@ -644,101 +443,27 @@ function renderMatrix() {
   return frag;
 }
 
-// Render cell content (main status + optional loop statuses)
-function renderCellContent(cell) {
-  const loops = cell.loops || [];
-  if(!loops.length) return renderChip(cell);
-
-  const stack = h("div",{className:"cell-stack"});
-  stack.appendChild(renderChip(cell));
-  loops.forEach((lp,li)=>{
-    const lr = h("div",{className:"loop-row"});
-    lr.appendChild(h("span",{className:"loop-badge"},"↻ "+(li+1)));
-    lr.appendChild(renderChip(lp));
-    stack.appendChild(lr);
-  });
-  return stack;
-}
-
 function renderChip(cell) {
-  if(!cell || cell.status==="none") return h("span",{style:{color:"var(--none-text)"}},"·");
+  if(cell.status==="none") return h("span",{style:{color:"var(--none-text)"}},"·");
   return h("span",{className:"chip "+cell.status}, cell.person||STATUS_LABELS[cell.status]);
 }
 
-function renderPopup(cid, sid, cell) {
-  const loops = cell.loops || [];
+function renderPopup(cid,sid,cell) {
   const pop = h("div",{className:"popup",onClick:e=>e.stopPropagation()});
-
-  // ── Main status ──
   pop.appendChild(h("div",{className:"popup-label"},"STATUS"));
   const sg=h("div",{style:{marginBottom:"8px"}});
   Object.entries(STATUS_LABELS).forEach(([k,v])=>{
-    const btn=h("button",{className:"popup-btn"+(cell.status===k?" selected":""),
-      style:{color:"var(--"+k+"-text)",background:cell.status===k?"var(--"+k+"-bg)":"transparent",borderColor:cell.status===k?"var(--"+k+"-border)":"var(--border)"},
-      onClick:()=>setCell(cid,sid,{...cell,status:k,loops:loops})
-    },v);
+    const btn=h("button",{className:"popup-btn"+(cell.status===k?" selected":""),style:{color:"var(--"+k+"-text)",background:cell.status===k?"var(--"+k+"-bg)":"transparent",borderColor:cell.status===k?"var(--"+k+"-border)":"var(--border)"},onClick:()=>setCell(cid,sid,{...cell,status:k})},v);
     sg.appendChild(btn);
   });
   pop.appendChild(sg);
-
-  // ── Person ──
   pop.appendChild(h("div",{className:"popup-label"},"PERSON"));
-  const pg=h("div",{style:{display:"flex",flexWrap:"wrap",gap:"3px",marginBottom:"8px"}});
-  pg.appendChild(h("button",{className:"popup-person"+(!cell.person?" selected":""),onClick:()=>setCell(cid,sid,{...cell,person:"",loops:loops})},"—"));
+  const pg=h("div",{style:{display:"flex",flexWrap:"wrap",gap:"3px"}});
+  pg.appendChild(h("button",{className:"popup-person"+(!cell.person?" selected":""),onClick:()=>setCell(cid,sid,{...cell,person:""})},"—"));
   state.team.forEach(t=>{
-    pg.appendChild(h("button",{className:"popup-person"+(cell.person===t?" selected":""),onClick:()=>setCell(cid,sid,{...cell,person:t,loops:loops})},t));
+    pg.appendChild(h("button",{className:"popup-person"+(cell.person===t?" selected":""),onClick:()=>setCell(cid,sid,{...cell,person:t})},t));
   });
   pop.appendChild(pg);
-
-  // ── Loops (only in editMode) ──
-  if(state.editMode) {
-    pop.appendChild(h("div",{className:"popup-section-title"},"↻ Zusatzschleifen"));
-
-    // Existing loops
-    loops.forEach((lp,li)=>{
-      const lsec = h("div",{style:{marginBottom:"5px",paddingLeft:"6px",borderLeft:"2px solid var(--loop-border)"}});
-      lsec.appendChild(h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"2px"}},
-        h("span",{style:{fontSize:"9px",color:"var(--loop-text)",fontWeight:"600"}},"SCHLEIFE "+(li+1)),
-        h("button",{className:"popup-loop-remove",onClick:()=>{
-          const newLoops=[...loops]; newLoops.splice(li,1);
-          setCell(cid,sid,{...cell,loops:newLoops});
-        }},"✕ entfernen")
-      ));
-      // Status buttons for loop
-      const lsg=h("div",{style:{display:"flex",flexWrap:"wrap",gap:"2px",marginBottom:"3px"}});
-      Object.entries(STATUS_LABELS).forEach(([k,v])=>{
-        if(k==="none") return;
-        lsg.appendChild(h("button",{
-          style:{padding:"2px 6px",fontSize:"9px",background:lp.status===k?"var(--"+k+"-bg)":"transparent",
-            border:"1px solid "+(lp.status===k?"var(--"+k+"-border)":"var(--border)"),
-            borderRadius:"3px",cursor:"pointer",fontFamily:"inherit",color:"var(--"+k+"-text)"},
-          onClick:()=>{ const nl=[...loops]; nl[li]={...nl[li],status:k}; setCell(cid,sid,{...cell,loops:nl}); }
-        },v));
-      });
-      lsec.appendChild(lsg);
-      // Person for loop
-      const lpg=h("div",{style:{display:"flex",flexWrap:"wrap",gap:"2px"}});
-      lpg.appendChild(h("button",{
-        style:{padding:"1px 5px",fontSize:"9px",background:!lp.person?"var(--accent)":"transparent",border:"1px solid var(--borderStrong)",borderRadius:"3px",cursor:"pointer",fontFamily:"inherit"},
-        onClick:()=>{ const nl=[...loops]; nl[li]={...nl[li],person:""}; setCell(cid,sid,{...cell,loops:nl}); }
-      },"—"));
-      state.team.forEach(t=>{
-        lpg.appendChild(h("button",{
-          style:{padding:"1px 5px",fontSize:"9px",background:lp.person===t?"var(--accent)":"transparent",border:"1px solid var(--borderStrong)",borderRadius:"3px",cursor:"pointer",fontFamily:"inherit",color:lp.person===t?"var(--textStrong)":"var(--textMuted)"},
-          onClick:()=>{ const nl=[...loops]; nl[li]={...nl[li],person:t}; setCell(cid,sid,{...cell,loops:nl}); }
-        },t));
-      });
-      lsec.appendChild(lpg);
-      pop.appendChild(lsec);
-    });
-
-    // Add loop button
-    pop.appendChild(h("button",{className:"popup-loop-btn",onClick:()=>{
-      const newLoops=[...loops,{status:"active",person:""}];
-      setCell(cid,sid,{...cell,loops:newLoops});
-    }},"+ Zusatzschleife hinzufügen"));
-  }
-
   return pop;
 }
 
@@ -773,11 +498,9 @@ function renderDashboard() {
     if(step.substeps?.length) step.substeps.forEach(sub=>{
       const c=getCell(con.id,sub.id);
       if(["active","blocked","review"].includes(c.status)) nexts.push({con:con.name,step:step.name+" → "+sub.name,status:c.status,person:c.person});
-      (c.loops||[]).forEach((lp,li)=>{ if(["active","blocked","review"].includes(lp.status)) nexts.push({con:con.name,step:step.name+" → "+sub.name+" ↻"+(li+1),status:lp.status,person:lp.person}); });
     }); else {
       const c=getCell(con.id,step.id);
       if(["active","blocked","review"].includes(c.status)) nexts.push({con:con.name,step:step.name,status:c.status,person:c.person});
-      (c.loops||[]).forEach((lp,li)=>{ if(["active","blocked","review"].includes(lp.status)) nexts.push({con:con.name,step:step.name+" ↻"+(li+1),status:lp.status,person:lp.person}); });
     }
   }));
   if(!nexts.length) frag.appendChild(h("div",{style:{color:"var(--textMuted)",padding:"14px"}},"Keine offenen Aufgaben."));
@@ -802,7 +525,6 @@ function renderTasks() {
   state.constructions.forEach(con=>getAllIds(state.steps).forEach(sid=>{
     const c=getCell(con.id,sid);
     if(c.person&&!["done","none"].includes(c.status)){ if(!tasks[c.person])tasks[c.person]=[]; tasks[c.person].push({con:con.name,step:findName(sid),status:c.status}); }
-    (c.loops||[]).forEach(lp=>{ if(lp.person&&!["done","none"].includes(lp.status)){ if(!tasks[lp.person])tasks[lp.person]=[]; tasks[lp.person].push({con:con.name,step:findName(sid)+" ↻",status:lp.status}); } });
   }));
   const grid=h("div",{className:"card-grid"});
   state.team.forEach(person=>{
@@ -835,9 +557,6 @@ function renderTasks() {
 document.addEventListener("click", (e) => {
   if(state.activeCell && !e.target.closest(".popup") && !e.target.closest(".cell")) {
     state.activeCell = null; render();
-  }
-  if(state.renaming && !e.target.closest(".rename-input") && !e.target.closest(".suggest-list")) {
-    state.renaming = null; render();
   }
 });
 
