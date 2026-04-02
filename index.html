@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Konstruktion Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f4f5f7; --bgCard: #ffffff; --border: #e0e3e8; --borderStrong: #c8cdd5;
+    --text: #3a4250; --textStrong: #111827; --textMuted: #7b8494; --textFaint: #bfc5ce;
+    --accent: #eceef2; --popBg: #ffffff; --shadow: rgba(0,0,0,0.13);
+    --done-bg: #dcfce7; --done-border: #86efac; --done-text: #15803d;
+    --active-bg: #fef9c3; --active-border: #fde047; --active-text: #a16207;
+    --blocked-bg: #fee2e2; --blocked-border: #fca5a5; --blocked-text: #dc2626;
+    --review-bg: #e0e7ff; --review-border: #a5b4fc; --review-text: #4338ca;
+    --none-bg: #f0f1f4; --none-border: #dde0e5; --none-text: #a0a8b4;
+  }
+  [data-theme="dark"] {
+    --bg: #0d0d1a; --bgCard: #111128; --border: #1e1e3a; --borderStrong: #2a2a5a;
+    --text: #c8d6e5; --textStrong: #e2e8f0; --textMuted: #667788; --textFaint: #334455;
+    --accent: #1a1a3a; --popBg: #151530; --shadow: rgba(0,0,0,0.5);
+    --done-bg: #0d3320; --done-border: #1a6640; --done-text: #4ade80;
+    --active-bg: #332800; --active-border: #665000; --active-text: #facc15;
+    --blocked-bg: #3b1010; --blocked-border: #7a2020; --blocked-text: #f87171;
+    --review-bg: #1a1a40; --review-border: #3535a0; --review-text: #818cf8;
+    --none-bg: #1a1a2e; --none-border: #2a2a4a; --none-text: #556677;
+  }
+
+  body { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; }
+
+  /* Login */
+  .login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 20px; }
+  .login-screen h1 { font-size: 18px; letter-spacing: 3px; text-transform: uppercase; color: var(--textStrong); }
+  .login-btn { display: flex; align-items: center; gap: 10px; padding: 12px 28px; background: var(--bgCard); border: 1px solid var(--borderStrong); border-radius: 6px; color: var(--textStrong); cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; transition: all .2s; }
+  .login-btn:hover { background: var(--accent); }
+  .login-btn svg { width: 20px; height: 20px; }
+
+  /* Header */
+  .header { background: var(--bgCard); border-bottom: 1px solid var(--border); padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .header-title { font-size: 14px; font-weight: 700; letter-spacing: 2px; color: var(--textStrong); text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+  .header-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--done-text); box-shadow: 0 0 6px var(--done-text); }
+  .header-actions { display: flex; gap: 3px; align-items: center; flex-wrap: wrap; }
+  .user-info { display: flex; align-items: center; gap: 8px; margin-right: 8px; font-size: 11px; color: var(--textMuted); }
+  .user-avatar { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--borderStrong); }
+
+  /* Buttons */
+  .btn { padding: 5px 12px; background: transparent; border: 1px solid transparent; border-radius: 4px; color: var(--textMuted); cursor: pointer; font-size: 11px; font-family: inherit; letter-spacing: 1px; }
+  .btn.active { background: var(--accent); border-color: var(--borderStrong); color: var(--textStrong); }
+  .btn-sm { padding: 4px 10px; background: var(--accent); border: 1px solid var(--borderStrong); border-radius: 4px; color: var(--textMuted); cursor: pointer; font-size: 11px; font-family: inherit; }
+  .btn-edit { background: none; border: none; color: var(--textMuted); cursor: pointer; font-size: 10px; font-family: inherit; padding: 1px 3px; }
+  .btn-edit.danger { color: var(--blocked-text); }
+  .btn-theme { padding: 4px 10px; background: transparent; border: 1px solid var(--borderStrong); border-radius: 4px; color: var(--textMuted); cursor: pointer; font-size: 14px; }
+  .btn-editmode { padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-family: inherit; }
+  .btn-editmode.on { background: var(--blocked-bg); border: 1px solid var(--blocked-border); color: var(--blocked-text); }
+  .btn-editmode.off { background: transparent; border: 1px solid var(--borderStrong); color: var(--textMuted); }
+  .btn-logout { padding: 5px 12px; background: transparent; border: 1px solid var(--borderStrong); border-radius: 4px; color: var(--textMuted); cursor: pointer; font-size: 10px; font-family: inherit; }
+  .divider { width: 1px; height: 18px; background: var(--border); margin: 0 4px; }
+
+  /* Table */
+  .content { padding: 14px 18px; }
+  .legend { display: flex; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-swatch { width: 11px; height: 11px; border-radius: 2px; }
+  table { border-collapse: collapse; width: 100%; min-width: 600px; }
+  th { padding: 10px 12px; border-bottom: 2px solid var(--border); color: var(--textMuted); font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; text-align: center; }
+  th.left { text-align: left; min-width: 220px; }
+  td { padding: 5px 10px; border-bottom: 1px solid var(--border); font-size: 12px; }
+  td.step-main { font-weight: 700; color: var(--textStrong); background: var(--bgCard); }
+  td.step-sub { padding-left: 26px; color: var(--textMuted); font-size: 11px; }
+  td.cell { text-align: center; position: relative; cursor: pointer; }
+  td.cell-main { text-align: center; background: var(--bgCard); }
+
+  /* Cell chips */
+  .chip { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+  .chip.done { background: var(--done-bg); border: 1px solid var(--done-border); color: var(--done-text); }
+  .chip.active { background: var(--active-bg); border: 1px solid var(--active-border); color: var(--active-text); }
+  .chip.blocked { background: var(--blocked-bg); border: 1px solid var(--blocked-border); color: var(--blocked-text); }
+  .chip.review { background: var(--review-bg); border: 1px solid var(--review-border); color: var(--review-text); }
+
+  /* Dot */
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .dot.done { background: var(--done-text); }
+  .dot.active { background: var(--active-text); }
+  .dot.blocked { background: var(--blocked-text); }
+  .dot.review { background: var(--review-text); }
+
+  /* Popup */
+  .popup-overlay { position: fixed; inset: 0; z-index: 99; }
+  .popup { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: var(--popBg); border: 1px solid var(--borderStrong); border-radius: 8px; padding: 10px; z-index: 100; min-width: 170px; box-shadow: 0 8px 28px var(--shadow); }
+  .popup-label { font-size: 9px; color: var(--textMuted); letter-spacing: 1px; margin-bottom: 5px; }
+  .popup-btn { display: block; width: 100%; padding: 4px 8px; background: transparent; border: 1px solid var(--border); border-radius: 3px; cursor: pointer; font-size: 11px; font-family: inherit; text-align: left; margin-bottom: 2px; }
+  .popup-btn.selected { border-color: var(--borderStrong); }
+  .popup-person { padding: 2px 7px; background: transparent; border: 1px solid var(--borderStrong); border-radius: 3px; cursor: pointer; font-size: 10px; font-family: inherit; }
+  .popup-person.selected { background: var(--accent); color: var(--textStrong); }
+
+  /* Modal */
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .modal { background: var(--popBg); border: 1px solid var(--borderStrong); border-radius: 8px; padding: 24px; min-width: 280px; box-shadow: 0 12px 40px var(--shadow); }
+  .modal h3 { margin-bottom: 10px; font-weight: 600; color: var(--textStrong); font-size: 13px; }
+  input.field { padding: 5px 8px; background: var(--bg); border: 1px solid var(--borderStrong); border-radius: 4px; color: var(--textStrong); font-size: 11px; font-family: inherit; outline: none; width: 100%; }
+
+  /* Progress */
+  .progress-bar { height: 5px; background: var(--accent); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+  .mini-bar { display: flex; align-items: center; gap: 5px; }
+  .mini-track { height: 3px; width: 44px; background: var(--accent); border-radius: 2px; overflow: hidden; }
+
+  /* Cards */
+  .section-title { font-size: 13px; font-weight: 700; color: var(--textStrong); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+  .card { background: var(--bgCard); border: 1px solid var(--border); border-radius: 8px; padding: 18px; }
+  .next-row { display: flex; align-items: center; gap: 10px; padding: 9px 14px; background: var(--bgCard); border: 1px solid var(--border); border-radius: 5px; margin-bottom: 5px; }
+
+  /* Team bar */
+  .team-bar { margin-top: 16px; padding: 12px; background: var(--bgCard); border-radius: 6px; border: 1px solid var(--border); }
+  .team-tag { padding: 3px 8px; background: var(--accent); border: 1px solid var(--borderStrong); border-radius: 4px; display: inline-flex; align-items: center; gap: 5px; font-size: 11px; }
+
+  /* Saving indicator */
+  .save-indicator { position: fixed; bottom: 16px; right: 16px; padding: 6px 14px; background: var(--done-bg); border: 1px solid var(--done-border); color: var(--done-text); border-radius: 6px; font-size: 11px; font-family: inherit; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 200; }
+  .save-indicator.show { opacity: 1; }
+
+  .repeat-badge { font-size: 8px; color: var(--review-text); border: 1px solid var(--review-border); border-radius: 2px; padding: 0 3px; line-height: 14px; }
+  .sub-arrow { color: var(--textFaint); margin-right: 3px; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .header { padding: 10px 12px; }
+    .content { padding: 10px 12px; }
+    .card-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+// ╔══════════════════════════════════════════════════════════╗
+// ║  HIER DEINE FIREBASE CONFIG EINFÜGEN                    ║
+// ╚══════════════════════════════════════════════════════════╝
+const firebaseConfig = {
+  apiKey: "AIzaSyDrLP5LF4OmjAkyn6O0o8d6bLqu0VqtDfs",
+  authDomain: "lop-tool.firebaseapp.com",
+  projectId: "lop-tool",
+  storageBucket: "lop-tool.firebasestorage.app",
+  messagingSenderId: "137174368951",
+  appId: "1:137174368951:web:1bdf9e3d7100789f9f4332"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+const STATUS_LABELS = { none: "—", done: "Erledigt", active: "In Arbeit", blocked: "Blockiert", review: "Review" };
+const uid = () => Math.random().toString(36).slice(2, 9);
+
+const DEFAULT_STEPS = [
+  { id:"s1", name:"CAD-Anpassungen", repeatable:false, substeps:[{id:"s1a",name:"Modell"},{id:"s1b",name:"Zeichnung"}] },
+  { id:"s2", name:"Toleranz-Analyse", repeatable:false, substeps:[{id:"s2a",name:"Skizzen-Modell"},{id:"s2b",name:"Skizzen-Zeichnung"},{id:"s2c",name:"Toleranz-Berechnung"},{id:"s2d",name:"Toleranz-Auswertung"}] },
+  { id:"s3", name:"CAD-Daten-Erstellung", repeatable:false, substeps:[{id:"s3a",name:"Anforderungen-Übernahme"},{id:"s3b",name:"Toleranz-Übernahme"},{id:"s3c",name:"Kollisions-Prüfung"},{id:"s3d",name:"Modell-Bemaßung"},{id:"s3e",name:"Prüfmaße"}] },
+  { id:"s4", name:"SAP-Pflege", repeatable:false, substeps:[{id:"s4a",name:"Teile-Guss"},{id:"s4b",name:"Teile-Fräs"},{id:"s4c",name:"Teile-Verbindung"},{id:"s4d",name:"Teile-Dichtung"}] },
+  { id:"s5", name:"CAD-Daten-Ablage", repeatable:false, substeps:[] },
+  { id:"s6", name:"3D-Druck/Prüfung", repeatable:true, substeps:[{id:"s6a",name:"Daten-Abgabe"},{id:"s6b",name:"Druck-Erfolgreich"},{id:"s6c",name:"Bearbeitung-Erfolgreich"},{id:"s6d",name:"Druck-Verbaut/Analysiert"}] },
+  { id:"s7", name:"Prüfzeichnungen", repeatable:false, substeps:[{id:"s7a",name:"Daten-Abgabe"},{id:"s7b",name:"Prüfzeichnungen-Erstellt"}] },
+  { id:"s8", name:"Lieferung", repeatable:false, substeps:[{id:"s8a",name:"Anfrage / Daten-Abgabe"},{id:"s8b",name:"RM-Erhalt"},{id:"s8c",name:"RM-Bearbeitet"},{id:"s8d",name:"Bestellung / Daten-Abgabe"}] },
+];
+const DEFAULT_CONSTRUCTIONS = [{id:"c1",name:"NM 045"},{id:"c2",name:"NM 011"},{id:"c3",name:"NM 021"},{id:"c4",name:"NM 031"}];
+const DEFAULT_TEAM = ["OZ","REV","Wladi","Sabrina"];
+
+// ─── App State ───
+let state = {
+  user: null,
+  steps: DEFAULT_STEPS,
+  constructions: DEFAULT_CONSTRUCTIONS,
+  team: DEFAULT_TEAM,
+  matrix: {},
+  view: "matrix",
+  theme: "light",
+  editMode: false,
+  activeCell: null,
+  saving: false,
+};
+
+let saveTimeout = null;
+let unsubscribe = null;
+
+// ─── Firebase Sync ───
+function docRef() {
+  return db.collection("tracker").doc("shared");
+}
+
+function loadData() {
+  if (unsubscribe) unsubscribe();
+  unsubscribe = docRef().onSnapshot(snap => {
+    if (snap.exists) {
+      const d = snap.data();
+      if (d.steps) state.steps = d.steps;
+      if (d.constructions) state.constructions = d.constructions;
+      if (d.team) state.team = d.team;
+      if (d.matrix) state.matrix = d.matrix;
+      render();
+    }
+  });
+}
+
+function saveData() {
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(async () => {
+    state.saving = true; render();
+    try {
+      await docRef().set({
+        steps: state.steps,
+        constructions: state.constructions,
+        team: state.team,
+        matrix: state.matrix,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedBy: state.user?.displayName || "unknown",
+      }, { merge: true });
+    } catch(e) { console.error("Save error:", e); }
+    state.saving = false;
+    state.showSaved = true; render();
+    setTimeout(() => { state.showSaved = false; render(); }, 1500);
+  }, 500);
+}
+
+// ─── Helpers ───
+function getAllIds(steps) {
+  const ids = [];
+  steps.forEach(s => { ids.push(s.id); (s.substeps||[]).forEach(ss => ids.push(ss.id)); });
+  return ids;
+}
+function ck(cid,sid) { return cid+"::"+sid; }
+function getCell(cid,sid) { return state.matrix[ck(cid,sid)] || {status:"none",person:""}; }
+function setCell(cid,sid,d) { state.matrix[ck(cid,sid)]=d; state.activeCell=null; saveData(); render(); }
+function getProgress(cid) {
+  const ids=getAllIds(state.steps), t=ids.length;
+  if(!t) return {done:0,active:0,blocked:0,review:0,pct:0,total:0};
+  let d=0,a=0,b=0,r=0;
+  ids.forEach(sid=>{ const c=getCell(cid,sid); if(c.status==="done")d++; if(c.status==="active")a++; if(c.status==="blocked")b++; if(c.status==="review")r++; });
+  return {done:d,active:a,blocked:b,review:r,pct:Math.round(d/t*100),total:t};
+}
+function findName(sid) {
+  for(const s of state.steps){ if(s.id===sid)return s.name; for(const ss of(s.substeps||[]))if(ss.id===sid)return s.name+" → "+ss.name; }
+  return sid;
+}
+
+// ─── Render ───
+function h(tag,attrs,...children) {
+  const el = document.createElement(tag);
+  if(attrs) Object.entries(attrs).forEach(([k,v])=>{
+    if(k==="className") el.className=v;
+    else if(k.startsWith("on")) el.addEventListener(k.slice(2).toLowerCase(),v);
+    else if(k==="style"&&typeof v==="object") Object.assign(el.style,v);
+    else el.setAttribute(k,v);
+  });
+  children.flat(9).forEach(c=>{ if(c==null)return; el.appendChild(typeof c==="string"?document.createTextNode(c):c); });
+  return el;
+}
+
+function render() {
+  document.body.setAttribute("data-theme", state.theme);
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  if (!state.user) { app.appendChild(renderLogin()); return; }
+  app.appendChild(renderHeader());
+  const content = h("div",{className:"content"});
+  if (state.view==="matrix") content.appendChild(renderMatrix());
+  else if (state.view==="dashboard") content.appendChild(renderDashboard());
+  else if (state.view==="tasks") content.appendChild(renderTasks());
+  app.appendChild(content);
+  // Save indicator
+  const si = h("div",{className:"save-indicator"+(state.showSaved?" show":"")}, "✓ Gespeichert");
+  app.appendChild(si);
+}
+
+function renderLogin() {
+  return h("div",{className:"login-screen"},
+    h("div",{style:{width:"7px",height:"7px",borderRadius:"50%",background:"var(--done-text)",boxShadow:"0 0 6px var(--done-text)"}}),
+    h("h1",null,"Konstruktion Tracker"),
+    h("button",{className:"login-btn",onClick:()=>auth.signInWithPopup(provider)},
+      h("span",null,"🔐"),
+      h("span",null,"Mit Google anmelden")
+    ),
+    h("p",{style:{color:"var(--textMuted)",fontSize:"11px",maxWidth:"300px",textAlign:"center"}},"Alle Teammitglieder melden sich mit ihrem Google-Konto an und arbeiten in Echtzeit zusammen.")
+  );
+}
+
+function renderHeader() {
+  const views = [{key:"matrix",label:"Matrix"},{key:"dashboard",label:"Dashboard"},{key:"tasks",label:"Aufgaben"}];
+  return h("div",{className:"header"},
+    h("div",{className:"header-title"},
+      h("div",{className:"header-dot"}),
+      "Konstruktion Tracker"
+    ),
+    h("div",{className:"header-actions"},
+      h("div",{className:"user-info"},
+        state.user.photoURL ? h("img",{className:"user-avatar",src:state.user.photoURL}) : null,
+        state.user.displayName || state.user.email
+      ),
+      ...views.map(v=>h("button",{className:"btn"+(state.view===v.key?" active":""),onClick:()=>{state.view=v.key;render();}},v.label)),
+      h("div",{className:"divider"}),
+      h("button",{className:"btn-theme",onClick:()=>{state.theme=state.theme==="dark"?"light":"dark";render();}}, state.theme==="dark"?"☀":"☾"),
+      h("button",{className:"btn-editmode "+(state.editMode?"on":"off"),onClick:()=>{state.editMode=!state.editMode;render();}}, state.editMode?"✕ Fertig":"✎ Bearbeiten"),
+      h("button",{className:"btn-logout",onClick:()=>{auth.signOut();}},"Abmelden")
+    )
+  );
+}
+
+function renderMatrix() {
+  const frag = document.createDocumentFragment();
+  // Legend
+  const legend = h("div",{className:"legend"});
+  ["done","active","blocked","review"].forEach(k=>{
+    legend.appendChild(h("div",{className:"legend-item"},
+      h("div",{className:"legend-swatch",style:{background:"var(--"+k+"-bg)",border:"1px solid var(--"+k+"-border)"}}),
+      h("span",{style:{color:"var(--"+k+"-text)",fontSize:"11px"}},STATUS_LABELS[k])
+    ));
+  });
+  frag.appendChild(legend);
+
+  // Table
+  const wrapper = h("div",{style:{overflowX:"auto"}});
+  const table = h("table",null);
+  // Header
+  const thead = h("thead",null);
+  const hrow = h("tr",null, h("th",{className:"left"},"Prozessschritt"));
+  state.constructions.forEach(con=>{
+    const th = h("th",{style:{minWidth:"95px",position:"relative"}});
+    th.appendChild(document.createTextNode(con.name));
+    if(state.editMode) th.appendChild(h("button",{className:"btn-edit danger",style:{position:"absolute",top:"2px",right:"2px"},onClick:()=>{state.constructions=state.constructions.filter(c=>c.id!==con.id);saveData();render();}},"✕"));
+    const p = getProgress(con.id);
+    const mini = h("div",{className:"mini-bar",style:{marginTop:"3px",justifyContent:"center"}},
+      h("div",{className:"mini-track"}, h("div",{style:{height:"100%",width:p.pct+"%",background:p.pct===100?"var(--done-text)":"var(--active-text)"}})),
+      h("span",{style:{fontSize:"9px",color:"var(--textMuted)"}},p.pct+"%")
+    );
+    th.appendChild(mini);
+    hrow.appendChild(th);
+  });
+  if(state.editMode) hrow.appendChild(h("th",null,h("button",{className:"btn-sm",onClick:()=>{const name=prompt("Neue Konstruktion:"); if(name){state.constructions.push({id:"c_"+uid(),name});saveData();render();}}},"+ Konstr.")));
+  thead.appendChild(hrow);
+  table.appendChild(thead);
+
+  // Body
+  const tbody = h("tbody",null);
+  state.steps.forEach((step,si)=>{
+    const hasSubs = step.substeps&&step.substeps.length>0;
+    // Main row
+    const tr = h("tr",null);
+    const tdName = h("td",{className:"step-main"});
+    const nameDiv = h("div",{style:{display:"flex",alignItems:"center",gap:"5px"}});
+    if(step.repeatable) nameDiv.appendChild(h("span",{className:"repeat-badge"},"↻"));
+    nameDiv.appendChild(h("span",{style:{flex:"1"}},step.name));
+    if(state.editMode){
+      const btns = h("span",{style:{display:"flex",gap:"1px"}});
+      if(si>0) btns.appendChild(h("button",{className:"btn-edit",onClick:()=>{const s=state.steps,i=s.findIndex(x=>x.id===step.id);[s[i],s[i-1]]=[s[i-1],s[i]];saveData();render();}},"▲"));
+      if(si<state.steps.length-1) btns.appendChild(h("button",{className:"btn-edit",onClick:()=>{const s=state.steps,i=s.findIndex(x=>x.id===step.id);[s[i],s[i+1]]=[s[i+1],s[i]];saveData();render();}},"▼"));
+      btns.appendChild(h("button",{className:"btn-edit",onClick:()=>{const name=prompt("Neuer Unterschritt:"); if(name){step.substeps.push({id:"ss_"+uid(),name});saveData();render();}}},"+"));
+      btns.appendChild(h("button",{className:"btn-edit danger",onClick:()=>{state.steps=state.steps.filter(s=>s.id!==step.id);saveData();render();}},"✕"));
+      nameDiv.appendChild(btns);
+    }
+    tdName.appendChild(nameDiv);
+    tr.appendChild(tdName);
+
+    state.constructions.forEach(con=>{
+      if(hasSubs){
+        const cells=step.substeps.map(ss=>getCell(con.id,ss.id));
+        const st=cells.every(c=>c.status==="done")?"done":cells.some(c=>c.status==="blocked")?"blocked":cells.some(c=>c.status==="active")?"active":"none";
+        tr.appendChild(h("td",{className:"cell-main"}, st!=="none"?h("span",{className:"dot "+st}):document.createTextNode("")));
+      } else {
+        const cell=getCell(con.id,step.id);
+        const td=h("td",{className:"cell",onClick:()=>{state.activeCell=state.activeCell===ck(con.id,step.id)?null:ck(con.id,step.id);render();}});
+        td.appendChild(renderChip(cell));
+        if(state.activeCell===ck(con.id,step.id)) td.appendChild(renderPopup(con.id,step.id,cell));
+        tr.appendChild(td);
+      }
+    });
+    if(state.editMode) tr.appendChild(h("td",null));
+    tbody.appendChild(tr);
+
+    // Substep rows
+    if(hasSubs) step.substeps.forEach((sub,ssi)=>{
+      const str = h("tr",null);
+      const stdName = h("td",{className:"step-sub"});
+      const sdiv = h("div",{style:{display:"flex",alignItems:"center",gap:"3px"}});
+      sdiv.appendChild(h("span",{className:"sub-arrow"},"└"));
+      sdiv.appendChild(h("span",{style:{flex:"1"}},sub.name));
+      if(state.editMode){
+        const sbtns = h("span",{style:{display:"flex",gap:"1px"}});
+        if(ssi>0) sbtns.appendChild(h("button",{className:"btn-edit",onClick:()=>{const ss=step.substeps;[ss[ssi],ss[ssi-1]]=[ss[ssi-1],ss[ssi]];saveData();render();}},"▲"));
+        if(ssi<step.substeps.length-1) sbtns.appendChild(h("button",{className:"btn-edit",onClick:()=>{const ss=step.substeps;[ss[ssi],ss[ssi+1]]=[ss[ssi+1],ss[ssi]];saveData();render();}},"▼"));
+        sbtns.appendChild(h("button",{className:"btn-edit danger",onClick:()=>{step.substeps=step.substeps.filter(ss=>ss.id!==sub.id);saveData();render();}},"✕"));
+        sdiv.appendChild(sbtns);
+      }
+      stdName.appendChild(sdiv);
+      str.appendChild(stdName);
+      state.constructions.forEach(con=>{
+        const cell=getCell(con.id,sub.id);
+        const td=h("td",{className:"cell",onClick:()=>{state.activeCell=state.activeCell===ck(con.id,sub.id)?null:ck(con.id,sub.id);render();}});
+        td.appendChild(renderChip(cell));
+        if(state.activeCell===ck(con.id,sub.id)) td.appendChild(renderPopup(con.id,sub.id,cell));
+        str.appendChild(td);
+      });
+      if(state.editMode) str.appendChild(h("td",null));
+      tbody.appendChild(str);
+    });
+  });
+
+  if(state.editMode){
+    const addRow=h("tr",null,h("td",{colSpan:99,style:{padding:"8px"}},
+      h("button",{className:"btn-sm",onClick:()=>{const name=prompt("Neuer Hauptschritt:"); if(name){state.steps.push({id:"s_"+uid(),name,repeatable:false,substeps:[]});saveData();render();}}},"+ Hauptschritt")
+    ));
+    tbody.appendChild(addRow);
+  }
+
+  table.appendChild(tbody);
+  wrapper.appendChild(table);
+  frag.appendChild(wrapper);
+
+  // Team management
+  if(state.editMode){
+    const tb=h("div",{className:"team-bar"});
+    tb.appendChild(h("div",{style:{fontWeight:"600",marginBottom:"8px",color:"var(--textStrong)",fontSize:"12px"}},"Team"));
+    const tw=h("div",{style:{display:"flex",gap:"6px",flexWrap:"wrap",alignItems:"center"}});
+    state.team.forEach(t=>{
+      tw.appendChild(h("span",{className:"team-tag"},t,
+        h("button",{className:"btn-edit danger",style:{fontSize:"9px"},onClick:()=>{state.team=state.team.filter(x=>x!==t);saveData();render();}},"✕")
+      ));
+    });
+    tw.appendChild(h("button",{className:"btn-sm",onClick:()=>{const name=prompt("Neues Teammitglied:"); if(name){state.team.push(name);saveData();render();}}},"+ Person"));
+    tb.appendChild(tw);
+    frag.appendChild(tb);
+  }
+
+  return frag;
+}
+
+function renderChip(cell) {
+  if(cell.status==="none") return h("span",{style:{color:"var(--none-text)"}},"·");
+  return h("span",{className:"chip "+cell.status}, cell.person||STATUS_LABELS[cell.status]);
+}
+
+function renderPopup(cid,sid,cell) {
+  const pop = h("div",{className:"popup",onClick:e=>e.stopPropagation()});
+  pop.appendChild(h("div",{className:"popup-label"},"STATUS"));
+  const sg=h("div",{style:{marginBottom:"8px"}});
+  Object.entries(STATUS_LABELS).forEach(([k,v])=>{
+    const btn=h("button",{className:"popup-btn"+(cell.status===k?" selected":""),style:{color:"var(--"+k+"-text)",background:cell.status===k?"var(--"+k+"-bg)":"transparent",borderColor:cell.status===k?"var(--"+k+"-border)":"var(--border)"},onClick:()=>setCell(cid,sid,{...cell,status:k})},v);
+    sg.appendChild(btn);
+  });
+  pop.appendChild(sg);
+  pop.appendChild(h("div",{className:"popup-label"},"PERSON"));
+  const pg=h("div",{style:{display:"flex",flexWrap:"wrap",gap:"3px"}});
+  pg.appendChild(h("button",{className:"popup-person"+(!cell.person?" selected":""),onClick:()=>setCell(cid,sid,{...cell,person:""})},"—"));
+  state.team.forEach(t=>{
+    pg.appendChild(h("button",{className:"popup-person"+(cell.person===t?" selected":""),onClick:()=>setCell(cid,sid,{...cell,person:t})},t));
+  });
+  pop.appendChild(pg);
+  return pop;
+}
+
+function renderDashboard() {
+  const frag=document.createDocumentFragment();
+  frag.appendChild(h("h2",{className:"section-title"},"Projekt-Übersicht"));
+  const grid=h("div",{className:"card-grid",style:{marginBottom:"28px"}});
+  state.constructions.forEach(con=>{
+    const p=getProgress(con.id);
+    const card=h("div",{className:"card"},
+      h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}},
+        h("span",{style:{fontWeight:"700",fontSize:"14px",color:"var(--textStrong)"}},con.name),
+        h("span",{style:{fontSize:"20px",fontWeight:"800",color:p.pct===100?"var(--done-text)":"var(--active-text)"}},p.pct+"%")
+      ),
+      h("div",{className:"progress-bar"},h("div",{className:"progress-fill",style:{width:p.pct+"%",background:p.pct===100?"var(--done-text)":p.pct>50?"var(--active-text)":"var(--review-text)"}}))
+    );
+    const stats=h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px",marginTop:"12px",fontSize:"11px"}});
+    [["Erledigt",p.done,"done"],["In Arbeit",p.active,"active"],["Blockiert",p.blocked,"blocked"],["Review",p.review,"review"]].forEach(([l,v,k])=>{
+      stats.appendChild(h("div",{style:{display:"flex",justifyContent:"space-between"}},
+        h("span",{style:{color:"var(--textMuted)"}},l),
+        h("span",{style:{color:"var(--"+k+"-text)",fontWeight:"600"}},v+"/"+p.total)
+      ));
+    });
+    card.appendChild(stats);
+    grid.appendChild(card);
+  });
+  frag.appendChild(grid);
+
+  frag.appendChild(h("h2",{className:"section-title"},"Nächste Schritte"));
+  const nexts=[];
+  state.constructions.forEach(con=>state.steps.forEach(step=>{
+    if(step.substeps?.length) step.substeps.forEach(sub=>{
+      const c=getCell(con.id,sub.id);
+      if(["active","blocked","review"].includes(c.status)) nexts.push({con:con.name,step:step.name+" → "+sub.name,status:c.status,person:c.person});
+    }); else {
+      const c=getCell(con.id,step.id);
+      if(["active","blocked","review"].includes(c.status)) nexts.push({con:con.name,step:step.name,status:c.status,person:c.person});
+    }
+  }));
+  if(!nexts.length) frag.appendChild(h("div",{style:{color:"var(--textMuted)",padding:"14px"}},"Keine offenen Aufgaben."));
+  else nexts.forEach(ns=>{
+    const row=h("div",{className:"next-row"},
+      h("span",{className:"dot "+ns.status}),
+      h("span",{style:{fontWeight:"600",color:"var(--textStrong)",minWidth:"70px"}},ns.con),
+      h("span",{style:{color:"var(--textMuted)",flex:"1"}},ns.step)
+    );
+    if(ns.person) row.appendChild(h("span",{style:{padding:"2px 7px",background:"var(--accent)",border:"1px solid var(--borderStrong)",borderRadius:"4px",fontSize:"10px"}},ns.person));
+    row.appendChild(h("span",{style:{fontSize:"10px",color:"var(--"+ns.status+"-text)"}},STATUS_LABELS[ns.status]));
+    frag.appendChild(row);
+  });
+  return frag;
+}
+
+function renderTasks() {
+  const frag=document.createDocumentFragment();
+  frag.appendChild(h("h2",{className:"section-title"},"Aufgaben pro Person"));
+  const tasks={};
+  state.team.forEach(p=>tasks[p]=[]);
+  state.constructions.forEach(con=>getAllIds(state.steps).forEach(sid=>{
+    const c=getCell(con.id,sid);
+    if(c.person&&!["done","none"].includes(c.status)){ if(!tasks[c.person])tasks[c.person]=[]; tasks[c.person].push({con:con.name,step:findName(sid),status:c.status}); }
+  }));
+  const grid=h("div",{className:"card-grid"});
+  state.team.forEach(person=>{
+    const card=h("div",{className:"card"},
+      h("div",{style:{fontWeight:"700",fontSize:"13px",color:"var(--textStrong)",marginBottom:"10px",display:"flex",justifyContent:"space-between",alignItems:"center"}},
+        h("span",null,person),
+        h("span",{style:{fontSize:"10px",padding:"2px 7px",background:"var(--accent)",borderRadius:"10px",color:tasks[person]?.length?"var(--active-text)":"var(--done-text)"}}, (tasks[person]?.length||0)+" offen")
+      )
+    );
+    if(!tasks[person]?.length) card.appendChild(h("div",{style:{color:"var(--textFaint)",fontSize:"11px"}},"Keine offenen Aufgaben"));
+    else { const list=h("div",{style:{display:"grid",gap:"5px"}});
+      tasks[person].forEach(t=>{
+        list.appendChild(h("div",{style:{padding:"7px 9px",background:"var(--bg)",borderRadius:"4px",border:"1px solid var(--"+t.status+"-border)",display:"flex",alignItems:"center",gap:"7px"}},
+          h("span",{className:"dot "+t.status}),
+          h("div",null,
+            h("div",{style:{fontSize:"11px",fontWeight:"600",color:"var(--text)"}},t.con),
+            h("div",{style:{fontSize:"10px",color:"var(--textMuted)"}},t.step)
+          )
+        ));
+      });
+      card.appendChild(list);
+    }
+    grid.appendChild(card);
+  });
+  frag.appendChild(grid);
+  return frag;
+}
+
+// Close popup on outside click
+document.addEventListener("click", (e) => {
+  if(state.activeCell && !e.target.closest(".popup") && !e.target.closest(".cell")) {
+    state.activeCell = null; render();
+  }
+});
+
+// Auth listener
+auth.onAuthStateChanged(user => {
+  state.user = user;
+  if (user) loadData();
+  else { if(unsubscribe) unsubscribe(); }
+  render();
+});
+</script>
+</body>
+</html>
