@@ -68,7 +68,7 @@
   .legend { display: flex; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 5px; }
   .legend-swatch { width: 11px; height: 11px; border-radius: 2px; }
-  .table-wrap { overflow-x: auto; position: relative; }
+  .table-wrap { overflow-x: auto; position: relative; padding-right: 100px; }
   table { border-collapse: collapse; width: 100%; min-width: 600px; }
   th { padding: 10px 12px; border-bottom: 2px solid var(--border); color: var(--textMuted); font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; text-align: center; }
   th.left { text-align: left; min-width: 220px; }
@@ -95,21 +95,22 @@
   .chip.review { background: var(--review-bg); border: 1px solid var(--review-border); color: var(--review-text); }
 
   /* Multi-block cell */
-  .cell-blocks { display: flex; flex-direction: column; gap: 3px; align-items: center; min-height: 24px; }
+  .cell-blocks { display: flex; flex-direction: row; gap: 4px; align-items: center; justify-content: center; min-height: 24px; flex-wrap: wrap; }
   .cell-block { position: relative; display: flex; align-items: center; gap: 2px; }
   .cell-block .add-block-btn { display: none; }
   .cell-block:hover .add-block-btn, .cell-blocks:hover .add-block-floating { display: inline-flex; }
   .add-block-btn { background: none; border: 1px dashed var(--borderStrong); color: var(--textFaint); cursor: pointer; font-size: 9px; padding: 0 3px; border-radius: 2px; font-family: inherit; }
   .add-block-btn:hover { color: var(--textStrong); border-color: var(--textMuted); }
-  .add-block-floating { display: none; margin-top: 2px; }
+  .add-block-floating { display: none; margin-left: 2px; }
+  .edit-active .add-block-floating { display: inline-flex !important; }
 
   /* Connector points for arrows */
   .connector-point { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--review-border); background: var(--popBg); cursor: crosshair; position: absolute; z-index: 10; }
   .connector-point:hover { background: var(--review-bg); border-color: var(--review-text); transform: scale(1.3); }
-  .connector-point.top { top: -4px; left: 50%; transform: translateX(-50%); }
-  .connector-point.bottom { bottom: -4px; left: 50%; transform: translateX(-50%); }
-  .connector-point.top:hover { transform: translateX(-50%) scale(1.3); }
-  .connector-point.bottom:hover { transform: translateX(-50%) scale(1.3); }
+  .connector-point.left { left: -4px; top: 50%; transform: translateY(-50%); }
+  .connector-point.right { right: -4px; top: 50%; transform: translateY(-50%); }
+  .connector-point.left:hover { transform: translateY(-50%) scale(1.3); }
+  .connector-point.right:hover { transform: translateY(-50%) scale(1.3); }
   .connector-point.active { background: var(--review-text); border-color: var(--review-text); }
 
   /* Dot */
@@ -164,7 +165,7 @@
   .iteration-badge { font-size: 8px; color: var(--textFaint); background: var(--accent); border: 1px solid var(--border); border-radius: 2px; padding: 0 3px; line-height: 14px; margin-left: 2px; }
 
   /* Arrow SVG overlay */
-  .arrow-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+  .arrow-overlay { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 5; overflow: visible; }
   .arrow-overlay line, .arrow-overlay path { pointer-events: auto; cursor: pointer; }
   .arrow-line { stroke: var(--review-text); stroke-width: 1.5; opacity: 0.6; }
   .arrow-line:hover { stroke-width: 2.5; opacity: 1; }
@@ -525,7 +526,7 @@ function renderMatrix() {
   frag.appendChild(legend);
 
   // Table
-  const wrapper = h("div", {className:"table-wrap", id:"matrix-wrap"});
+  const wrapper = h("div", {className:"table-wrap"+(state.editMode?" edit-active":""), id:"matrix-wrap"});
   const table = h("table", null);
 
   // Header
@@ -885,16 +886,16 @@ function renderMultiBlockCell(cid, sid) {
 
     // Connector points for arrow mode
     if(state.arrowMode && state.editMode) {
-      const topConn = h("div", {className:"connector-point top"+(state.arrowMode.from===cellKey?" active":""), onClick:e => {
+      const leftConn = h("div", {className:"connector-point left"+(state.arrowMode.from===cellKey?" active":""), onClick:e => {
         e.stopPropagation();
         handleArrowClick(cellKey);
       }});
-      const bottomConn = h("div", {className:"connector-point bottom"+(state.arrowMode.from===cellKey?" active":""), onClick:e => {
+      const rightConn = h("div", {className:"connector-point right"+(state.arrowMode.from===cellKey?" active":""), onClick:e => {
         e.stopPropagation();
         handleArrowClick(cellKey);
       }});
-      blockDiv.appendChild(topConn);
-      blockDiv.appendChild(bottomConn);
+      blockDiv.appendChild(leftConn);
+      blockDiv.appendChild(rightConn);
     }
 
     // Chip
@@ -1011,37 +1012,73 @@ function drawArrows() {
   const wrap = document.getElementById("matrix-wrap");
   if(!wrap) return;
 
-  // Clear existing arrows
+  // Clear existing arrows (keep defs)
   while(svg.childNodes.length > 1) svg.removeChild(svg.lastChild);
 
   const wrapRect = wrap.getBoundingClientRect();
-  svg.setAttribute("width", wrap.scrollWidth);
-  svg.setAttribute("height", wrap.scrollHeight);
-  svg.style.width = wrap.scrollWidth + "px";
-  svg.style.height = wrap.scrollHeight + "px";
+  const sw = Math.max(wrap.scrollWidth, wrap.clientWidth + 120);
+  const sh = wrap.scrollHeight;
+  svg.setAttribute("width", sw);
+  svg.setAttribute("height", sh);
+  svg.style.width = sw + "px";
+  svg.style.height = sh + "px";
+
+  // Find the right edge of the table for routing
+  const tableEl = wrap.querySelector("table");
+  const tableRight = tableEl ? (tableEl.getBoundingClientRect().right - wrapRect.left + wrap.scrollLeft) : sw - 20;
+
+  const BASE_OFFSET = 25;
+  const SPACING = 12;
 
   (state.arrows||[]).forEach((arrow, ai) => {
     const fromEl = wrap.querySelector('[data-cellkey="'+arrow.from+'"]');
     const toEl = wrap.querySelector('[data-cellkey="'+arrow.to+'"]');
     if(!fromEl || !toEl) return;
 
-    const fromRect = fromEl.getBoundingClientRect();
-    const toRect = toEl.getBoundingClientRect();
+    const fR = fromEl.getBoundingClientRect();
+    const tR = toEl.getBoundingClientRect();
 
-    const x1 = fromRect.left + fromRect.width/2 - wrapRect.left + wrap.scrollLeft;
-    const y1 = fromRect.bottom - wrapRect.top + wrap.scrollTop;
-    const x2 = toRect.left + toRect.width/2 - wrapRect.left + wrap.scrollLeft;
-    const y2 = toRect.top - wrapRect.top + wrap.scrollTop;
+    // All coordinates relative to wrap
+    const fRight = fR.right - wrapRect.left + wrap.scrollLeft;
+    const fCY = fR.top + fR.height/2 - wrapRect.top + wrap.scrollTop;
+    const tRight = tR.right - wrapRect.left + wrap.scrollLeft;
+    const tCY = tR.top + tR.height/2 - wrapRect.top + wrap.scrollTop;
 
-    // Draw curved path
-    const midY = (y1 + y2) / 2;
+    // Route column X: right of the rightmost block, staggered per arrow
+    const routeX = Math.max(fRight, tRight, tableRight) + BASE_OFFSET + (ai % 5) * SPACING;
+
+    // Build orthogonal path: exit right → go vertical → enter right (arrow points left ←)
+    const r = 5; // corner rounding
+    const x1 = fRight + 3;
+    const y1 = fCY;
+    const x2 = tRight + 3;
+    const y2 = tCY;
+
+    let d;
+    const dy = Math.abs(y2 - y1);
+    if(dy < 4) {
+      // Basically same row - simple horizontal line
+      d = `M ${x1} ${y1} L ${routeX} ${y1} L ${routeX} ${y2} L ${x2} ${y2}`;
+    } else {
+      // Right-side routing with rounded corners
+      const dirY = y2 > y1 ? 1 : -1;
+      d = `M ${x1} ${y1} `
+        + `L ${routeX - r} ${y1} `
+        + `Q ${routeX} ${y1}, ${routeX} ${y1 + dirY * r} `
+        + `L ${routeX} ${y2 - dirY * r} `
+        + `Q ${routeX} ${y2}, ${routeX - r} ${y2} `
+        + `L ${x2} ${y2}`;
+    }
+
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    const d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
     path.setAttribute("d", d);
     path.setAttribute("class", "arrow-line");
     path.setAttribute("fill", "none");
     path.setAttribute("marker-end", "url(#arrowhead)");
-    // Click to delete
+    path.setAttribute("stroke-linejoin", "round");
+    path.setAttribute("stroke-linecap", "round");
+
+    // Click to delete in edit mode
     if(state.editMode) {
       path.style.cursor = "pointer";
       path.addEventListener("click", () => {
