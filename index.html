@@ -68,7 +68,7 @@
   .legend { display: flex; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 5px; }
   .legend-swatch { width: 11px; height: 11px; border-radius: 2px; }
-  .table-wrap { overflow-x: auto; position: relative; padding-right: 100px; }
+  .table-wrap { overflow-x: auto; position: relative; padding-right: 40px; }
   table { border-collapse: collapse; width: 100%; min-width: 600px; }
   th { padding: 10px 12px; border-bottom: 2px solid var(--border); color: var(--textMuted); font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; text-align: center; }
   th.left { text-align: left; min-width: 220px; }
@@ -983,6 +983,16 @@ function renderPopup(cid, sid, blockIdx, cell) {
     pop.appendChild(h("div", {style:{fontSize:"9px",color:"var(--review-text)",marginTop:"4px"}}, "💡 Vorschlag: " + suggested));
   }
 
+  // Delete block button for Zusatzschleifen (block > 0)
+  if(blockIdx > 0) {
+    pop.appendChild(h("div", {style:{borderTop:"1px solid var(--border)",marginTop:"8px",paddingTop:"6px"}}));
+    pop.appendChild(h("button", {
+      className:"popup-btn",
+      style:{color:"var(--blocked-text)", background:"var(--blocked-bg)", borderColor:"var(--blocked-border)", fontSize:"10px", textAlign:"center"},
+      onClick:e => { e.stopPropagation(); removeBlock(cid, sid, blockIdx); }
+    }, "✕ Schleife entfernen"));
+  }
+
   return pop;
 }
 
@@ -1018,7 +1028,7 @@ function drawArrows() {
   while(svg.childNodes.length > 1) svg.removeChild(svg.lastChild);
 
   const wrapRect = wrap.getBoundingClientRect();
-  const sw = Math.max(wrap.scrollWidth, wrap.clientWidth + 120);
+  const sw = Math.max(wrap.scrollWidth, wrap.clientWidth + 40);
   const sh = wrap.scrollHeight + 20;
   svg.setAttribute("width", sw);
   svg.setAttribute("height", sh);
@@ -1027,7 +1037,8 @@ function drawArrows() {
 
   if(!state.arrows || !state.arrows.length) return;
 
-  // Group arrows by the column (right edge of td) for lane assignment
+  // Group arrows by column for lane assignment (to prevent overlap)
+  // Use the construction id (extracted from cellKey) as grouping key
   const columnLanes = {};
 
   const arrowData = [];
@@ -1039,49 +1050,42 @@ function drawArrows() {
     const fR = fromEl.getBoundingClientRect();
     const tR = toEl.getBoundingClientRect();
 
+    // Positions relative to wrap
     const fCX = fR.left + fR.width/2 - wrapRect.left + wrap.scrollLeft;
     const tCX = tR.left + tR.width/2 - wrapRect.left + wrap.scrollLeft;
     const fCY = fR.top + fR.height/2 - wrapRect.top + wrap.scrollTop;
     const tCY = tR.top + tR.height/2 - wrapRect.top + wrap.scrollTop;
+    const fRight = fR.right - wrapRect.left + wrap.scrollLeft;
+    const tRight = tR.right - wrapRect.left + wrap.scrollLeft;
     const fBot = fR.bottom - wrapRect.top + wrap.scrollTop;
     const fTopY = fR.top - wrapRect.top + wrap.scrollTop;
     const tBot = tR.bottom - wrapRect.top + wrap.scrollTop;
     const tTopY = tR.top - wrapRect.top + wrap.scrollTop;
 
-    // Find parent <td> for column boundaries
-    const fromTd = fromEl.closest("td");
-    const toTd = toEl.closest("td");
-    const fromTdR = fromTd ? fromTd.getBoundingClientRect() : fR;
-    const toTdR = toTd ? toTd.getBoundingClientRect() : tR;
+    // Route channel: just past the rightmost of the two blocks (not the whole td)
+    const blockRight = Math.max(fRight, tRight);
 
-    const colRight = Math.max(
-      fromTdR.right - wrapRect.left + wrap.scrollLeft,
-      toTdR.right - wrapRect.left + wrap.scrollLeft
-    );
-
-    // Lane key based on column
-    const colKey = Math.round(colRight);
+    // Group key for lane offset — use construction id from cellKey
+    const colKey = arrow.from.split("::")[0];
     if(!columnLanes[colKey]) columnLanes[colKey] = 0;
     const lane = columnLanes[colKey]++;
 
-    // Direction: is target below source?
     const down = tCY > fCY;
 
-    arrowData.push({ ai, fCX, tCX, fBot, fTopY, tBot, tTopY, colRight, lane, down });
+    arrowData.push({ ai, fCX, tCX, fBot, fTopY, tBot, tTopY, blockRight, lane, down });
   });
 
-  const LANE_BASE = 8;
-  const LANE_GAP = 10;
-  const r = 5;
+  const LANE_BASE = 6;
+  const LANE_GAP = 8;
+  const r = 4;
 
   arrowData.forEach(info => {
-    const { ai, fCX, tCX, fBot, fTopY, tBot, tTopY, colRight, lane, down } = info;
+    const { ai, fCX, tCX, fBot, fTopY, tBot, tTopY, blockRight, lane, down } = info;
 
-    // Route channel X
-    const rx = colRight + LANE_BASE + lane * LANE_GAP;
+    // Routing lane X: just beside the blocks
+    const rx = blockRight + LANE_BASE + lane * LANE_GAP;
 
     let startX, startY, endX, endY;
-
     if(down) {
       startX = fCX; startY = fBot + 1;
       endX = tCX;   endY = tTopY - 1;
@@ -1091,14 +1095,17 @@ function drawArrows() {
     }
 
     const dirY = down ? 1 : -1;
-
-    // If very close vertically (same row), draw a simple U-shape to the right
     const vDist = Math.abs(endY - startY);
+
+    // Skip if same cell
+    if(vDist < 4 && Math.abs(startX - endX) < 4) return;
+
     let d;
+    const stub = 4;
 
     if(vDist < 6) {
-      // Minimal U: go down a bit, over to lane, back
-      const bump = 14 * dirY;
+      // Same row: small U-shape bump
+      const bump = 12 * dirY;
       d = `M ${startX} ${startY}`
         + ` L ${startX} ${startY + bump}`
         + ` L ${rx} ${startY + bump}`
@@ -1106,28 +1113,25 @@ function drawArrows() {
         + ` L ${endX} ${endY + bump}`
         + ` L ${endX} ${endY}`;
     } else {
-      // Standard orthogonal route with rounded corners
-      // Path: start → stub → corner1 → horizontal to lane → corner2 → vertical in lane → corner3 → horizontal to target → corner4 → stub → end
-      const stub = 6;
-      const s1y = startY + dirY * stub;  // end of start stub
-      const e1y = endY - dirY * stub;    // start of end stub
+      // Orthogonal route with rounded corners
+      const s1y = startY + dirY * stub;
+      const e1y = endY - dirY * stub;
 
       d = `M ${startX} ${startY}`;
-      // Stub down/up from source
       d += ` L ${startX} ${s1y}`;
-      // Corner 1: turn toward routing lane
+      // Corner 1
       d += ` Q ${startX} ${s1y + dirY * r}, ${startX + r} ${s1y + dirY * r}`;
-      // Horizontal to just before lane
+      // Horizontal to lane
       d += ` L ${rx - r} ${s1y + dirY * r}`;
-      // Corner 2: turn into vertical lane
+      // Corner 2
       d += ` Q ${rx} ${s1y + dirY * r}, ${rx} ${s1y + dirY * r + dirY * r}`;
-      // Vertical travel in lane
+      // Vertical in lane
       d += ` L ${rx} ${e1y - dirY * r - dirY * r}`;
-      // Corner 3: turn from lane toward target
+      // Corner 3
       d += ` Q ${rx} ${e1y - dirY * r}, ${rx - r} ${e1y - dirY * r}`;
-      // Horizontal to just above/below target
+      // Horizontal to target
       d += ` L ${endX + r} ${e1y - dirY * r}`;
-      // Corner 4: turn into target
+      // Corner 4
       d += ` Q ${endX} ${e1y - dirY * r}, ${endX} ${e1y}`;
       // Stub into target
       d += ` L ${endX} ${endY}`;
