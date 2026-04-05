@@ -96,7 +96,8 @@
 
   /* Multi-block cell */
   .cell-blocks { display: flex; flex-direction: row; gap: 4px; align-items: center; justify-content: center; min-height: 24px; flex-wrap: wrap; }
-  .cell-block { position: relative; display: flex; align-items: center; gap: 2px; }
+  .cell-block { position: relative; display: flex; align-items: center; gap: 2px; cursor: pointer; border-radius: 4px; padding: 1px 2px; transition: background .15s; }
+  .cell-block:hover { background: var(--accent); }
   .cell-block .add-block-btn { display: none; }
   .cell-block:hover .add-block-btn, .cell-blocks:hover .add-block-floating { display: inline-flex; }
   .add-block-btn { background: none; border: 1px dashed var(--borderStrong); color: var(--textFaint); cursor: pointer; font-size: 9px; padding: 0 3px; border-radius: 2px; font-family: inherit; }
@@ -107,10 +108,10 @@
   /* Connector points for arrows */
   .connector-point { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--review-border); background: var(--popBg); cursor: crosshair; position: absolute; z-index: 10; }
   .connector-point:hover { background: var(--review-bg); border-color: var(--review-text); transform: scale(1.3); }
-  .connector-point.left { left: -4px; top: 50%; transform: translateY(-50%); }
-  .connector-point.right { right: -4px; top: 50%; transform: translateY(-50%); }
-  .connector-point.left:hover { transform: translateY(-50%) scale(1.3); }
-  .connector-point.right:hover { transform: translateY(-50%) scale(1.3); }
+  .connector-point.top { top: -4px; left: 50%; transform: translateX(-50%); }
+  .connector-point.bottom { bottom: -4px; left: 50%; transform: translateX(-50%); }
+  .connector-point.top:hover { transform: translateX(-50%) scale(1.3); }
+  .connector-point.bottom:hover { transform: translateX(-50%) scale(1.3); }
   .connector-point.active { background: var(--review-text); border-color: var(--review-text); }
 
   /* Dot */
@@ -882,30 +883,31 @@ function renderMultiBlockCell(cid, sid) {
   for(let bi = 0; bi < blockCount; bi++) {
     const cell = getCell(cid, sid, bi);
     const cellKey = ck(cid, sid, bi);
-    const blockDiv = h("div", {className:"cell-block", "data-cellkey":cellKey, style:{position:"relative"}});
+    const blockDiv = h("div", {className:"cell-block", "data-cellkey":cellKey, style:{position:"relative"},
+      onClick: e => {
+        e.stopPropagation();
+        if(state.arrowMode) { handleArrowClick(cellKey); return; }
+        state.activeCell = state.activeCell === cellKey ? null : cellKey;
+        render();
+      }
+    });
 
-    // Connector points for arrow mode
+    // Connector points for arrow mode (top/bottom)
     if(state.arrowMode && state.editMode) {
-      const leftConn = h("div", {className:"connector-point left"+(state.arrowMode.from===cellKey?" active":""), onClick:e => {
+      const topConn = h("div", {className:"connector-point top"+(state.arrowMode.from===cellKey?" active":""), onClick:e => {
         e.stopPropagation();
         handleArrowClick(cellKey);
       }});
-      const rightConn = h("div", {className:"connector-point right"+(state.arrowMode.from===cellKey?" active":""), onClick:e => {
+      const bottomConn = h("div", {className:"connector-point bottom"+(state.arrowMode.from===cellKey?" active":""), onClick:e => {
         e.stopPropagation();
         handleArrowClick(cellKey);
       }});
-      blockDiv.appendChild(leftConn);
-      blockDiv.appendChild(rightConn);
+      blockDiv.appendChild(topConn);
+      blockDiv.appendChild(bottomConn);
     }
 
     // Chip
     const chipEl = renderChip(cell);
-    chipEl.addEventListener("click", e => {
-      e.stopPropagation();
-      if(state.arrowMode) { handleArrowClick(cellKey); return; }
-      state.activeCell = state.activeCell === cellKey ? null : cellKey;
-      render();
-    });
     blockDiv.appendChild(chipEl);
 
     // Iteration badge for blocks > 0
@@ -1017,19 +1019,18 @@ function drawArrows() {
 
   const wrapRect = wrap.getBoundingClientRect();
   const sw = Math.max(wrap.scrollWidth, wrap.clientWidth + 120);
-  const sh = wrap.scrollHeight;
+  const sh = wrap.scrollHeight + 20;
   svg.setAttribute("width", sw);
   svg.setAttribute("height", sh);
   svg.style.width = sw + "px";
   svg.style.height = sh + "px";
 
-  // Find the right edge of the table for routing
-  const tableEl = wrap.querySelector("table");
-  const tableRight = tableEl ? (tableEl.getBoundingClientRect().right - wrapRect.left + wrap.scrollLeft) : sw - 20;
+  if(!state.arrows || !state.arrows.length) return;
 
-  const BASE_OFFSET = 25;
-  const SPACING = 12;
+  // Group arrows by the column (right edge of td) for lane assignment
+  const columnLanes = {};
 
+  const arrowData = [];
   (state.arrows||[]).forEach((arrow, ai) => {
     const fromEl = wrap.querySelector('[data-cellkey="'+arrow.from+'"]');
     const toEl = wrap.querySelector('[data-cellkey="'+arrow.to+'"]');
@@ -1038,36 +1039,98 @@ function drawArrows() {
     const fR = fromEl.getBoundingClientRect();
     const tR = toEl.getBoundingClientRect();
 
-    // All coordinates relative to wrap
-    const fRight = fR.right - wrapRect.left + wrap.scrollLeft;
+    const fCX = fR.left + fR.width/2 - wrapRect.left + wrap.scrollLeft;
+    const tCX = tR.left + tR.width/2 - wrapRect.left + wrap.scrollLeft;
     const fCY = fR.top + fR.height/2 - wrapRect.top + wrap.scrollTop;
-    const tRight = tR.right - wrapRect.left + wrap.scrollLeft;
     const tCY = tR.top + tR.height/2 - wrapRect.top + wrap.scrollTop;
+    const fBot = fR.bottom - wrapRect.top + wrap.scrollTop;
+    const fTopY = fR.top - wrapRect.top + wrap.scrollTop;
+    const tBot = tR.bottom - wrapRect.top + wrap.scrollTop;
+    const tTopY = tR.top - wrapRect.top + wrap.scrollTop;
 
-    // Route column X: right of the rightmost block, staggered per arrow
-    const routeX = Math.max(fRight, tRight, tableRight) + BASE_OFFSET + (ai % 5) * SPACING;
+    // Find parent <td> for column boundaries
+    const fromTd = fromEl.closest("td");
+    const toTd = toEl.closest("td");
+    const fromTdR = fromTd ? fromTd.getBoundingClientRect() : fR;
+    const toTdR = toTd ? toTd.getBoundingClientRect() : tR;
 
-    // Build orthogonal path: exit right → go vertical → enter right (arrow points left ←)
-    const r = 5; // corner rounding
-    const x1 = fRight + 3;
-    const y1 = fCY;
-    const x2 = tRight + 3;
-    const y2 = tCY;
+    const colRight = Math.max(
+      fromTdR.right - wrapRect.left + wrap.scrollLeft,
+      toTdR.right - wrapRect.left + wrap.scrollLeft
+    );
 
-    let d;
-    const dy = Math.abs(y2 - y1);
-    if(dy < 4) {
-      // Basically same row - simple horizontal line
-      d = `M ${x1} ${y1} L ${routeX} ${y1} L ${routeX} ${y2} L ${x2} ${y2}`;
+    // Lane key based on column
+    const colKey = Math.round(colRight);
+    if(!columnLanes[colKey]) columnLanes[colKey] = 0;
+    const lane = columnLanes[colKey]++;
+
+    // Direction: is target below source?
+    const down = tCY > fCY;
+
+    arrowData.push({ ai, fCX, tCX, fBot, fTopY, tBot, tTopY, colRight, lane, down });
+  });
+
+  const LANE_BASE = 8;
+  const LANE_GAP = 10;
+  const r = 5;
+
+  arrowData.forEach(info => {
+    const { ai, fCX, tCX, fBot, fTopY, tBot, tTopY, colRight, lane, down } = info;
+
+    // Route channel X
+    const rx = colRight + LANE_BASE + lane * LANE_GAP;
+
+    let startX, startY, endX, endY;
+
+    if(down) {
+      startX = fCX; startY = fBot + 1;
+      endX = tCX;   endY = tTopY - 1;
     } else {
-      // Right-side routing with rounded corners
-      const dirY = y2 > y1 ? 1 : -1;
-      d = `M ${x1} ${y1} `
-        + `L ${routeX - r} ${y1} `
-        + `Q ${routeX} ${y1}, ${routeX} ${y1 + dirY * r} `
-        + `L ${routeX} ${y2 - dirY * r} `
-        + `Q ${routeX} ${y2}, ${routeX - r} ${y2} `
-        + `L ${x2} ${y2}`;
+      startX = fCX; startY = fTopY - 1;
+      endX = tCX;   endY = tBot + 1;
+    }
+
+    const dirY = down ? 1 : -1;
+
+    // If very close vertically (same row), draw a simple U-shape to the right
+    const vDist = Math.abs(endY - startY);
+    let d;
+
+    if(vDist < 6) {
+      // Minimal U: go down a bit, over to lane, back
+      const bump = 14 * dirY;
+      d = `M ${startX} ${startY}`
+        + ` L ${startX} ${startY + bump}`
+        + ` L ${rx} ${startY + bump}`
+        + ` L ${rx} ${endY + bump}`
+        + ` L ${endX} ${endY + bump}`
+        + ` L ${endX} ${endY}`;
+    } else {
+      // Standard orthogonal route with rounded corners
+      // Path: start → stub → corner1 → horizontal to lane → corner2 → vertical in lane → corner3 → horizontal to target → corner4 → stub → end
+      const stub = 6;
+      const s1y = startY + dirY * stub;  // end of start stub
+      const e1y = endY - dirY * stub;    // start of end stub
+
+      d = `M ${startX} ${startY}`;
+      // Stub down/up from source
+      d += ` L ${startX} ${s1y}`;
+      // Corner 1: turn toward routing lane
+      d += ` Q ${startX} ${s1y + dirY * r}, ${startX + r} ${s1y + dirY * r}`;
+      // Horizontal to just before lane
+      d += ` L ${rx - r} ${s1y + dirY * r}`;
+      // Corner 2: turn into vertical lane
+      d += ` Q ${rx} ${s1y + dirY * r}, ${rx} ${s1y + dirY * r + dirY * r}`;
+      // Vertical travel in lane
+      d += ` L ${rx} ${e1y - dirY * r - dirY * r}`;
+      // Corner 3: turn from lane toward target
+      d += ` Q ${rx} ${e1y - dirY * r}, ${rx - r} ${e1y - dirY * r}`;
+      // Horizontal to just above/below target
+      d += ` L ${endX + r} ${e1y - dirY * r}`;
+      // Corner 4: turn into target
+      d += ` Q ${endX} ${e1y - dirY * r}, ${endX} ${e1y}`;
+      // Stub into target
+      d += ` L ${endX} ${endY}`;
     }
 
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -1078,7 +1141,6 @@ function drawArrows() {
     path.setAttribute("stroke-linejoin", "round");
     path.setAttribute("stroke-linecap", "round");
 
-    // Click to delete in edit mode
     if(state.editMode) {
       path.style.cursor = "pointer";
       path.addEventListener("click", () => {
