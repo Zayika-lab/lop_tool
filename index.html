@@ -33,15 +33,14 @@
     --section-bg: #0f0f24; --section-border: #1e1e3a;
   }
 
+  html { overflow-anchor: none; }
   body { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; }
 
-  /* Login */
   .login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 20px; }
   .login-screen h1 { font-size: 18px; letter-spacing: 3px; text-transform: uppercase; color: var(--textStrong); }
   .login-btn { display: flex; align-items: center; gap: 10px; padding: 12px 28px; background: var(--bgCard); border: 1px solid var(--borderStrong); border-radius: 6px; color: var(--textStrong); cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; transition: all .2s; }
   .login-btn:hover { background: var(--accent); }
 
-  /* Header */
   .header { background: var(--bgCard); border-bottom: 1px solid var(--border); padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
   .header-title { font-size: 14px; font-weight: 700; letter-spacing: 2px; color: var(--textStrong); text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
   .header-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--done-text); box-shadow: 0 0 6px var(--done-text); }
@@ -49,7 +48,6 @@
   .user-info { display: flex; align-items: center; gap: 8px; margin-right: 8px; font-size: 11px; color: var(--textMuted); }
   .user-avatar { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--borderStrong); }
 
-  /* Buttons */
   .btn { padding: 5px 12px; background: transparent; border: 1px solid transparent; border-radius: 4px; color: var(--textMuted); cursor: pointer; font-size: 11px; font-family: inherit; letter-spacing: 1px; }
   .btn.active { background: var(--accent); border-color: var(--borderStrong); color: var(--textStrong); }
   .btn-sm { padding: 4px 10px; background: var(--accent); border: 1px solid var(--borderStrong); border-radius: 4px; color: var(--textMuted); cursor: pointer; font-size: 11px; font-family: inherit; }
@@ -64,11 +62,10 @@
   .btn-editmode.off { background: transparent; border: 1px solid var(--borderStrong); color: var(--textMuted); }
   .btn-logout { padding: 5px 12px; background: transparent; border: 1px solid var(--borderStrong); border-radius: 4px; color: var(--textMuted); cursor: pointer; font-size: 10px; font-family: inherit; }
   .btn-undo { padding: 5px 12px; background: transparent; border: 1px solid var(--borderStrong); border-radius: 4px; color: var(--textMuted); cursor: pointer; font-size: 11px; font-family: inherit; transition: all .15s; }
-  .btn-undo:hover:not(:disabled) { background: var(--accent); color: var(--textStrong); }
-  .btn-undo:disabled { opacity: 0.35; cursor: default; }
+  .btn-undo:hover:not(.is-disabled) { background: var(--accent); color: var(--textStrong); }
+  .btn-undo.is-disabled { opacity: 0.35; cursor: default; pointer-events: none; }
   .divider { width: 1px; height: 18px; background: var(--border); margin: 0 4px; }
 
-  /* Table */
   .content { padding: 14px 18px; }
   .legend { display: flex; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 5px; }
@@ -83,21 +80,18 @@
   td.cell { text-align: center; position: relative; cursor: pointer; vertical-align: top; }
   td.cell-main { text-align: center; background: var(--bgCard); }
 
-  /* Indentation */
   .indent-section { padding-left: 8px !important; }
   .indent-main { padding-left: 26px !important; }
   .indent-sub { padding-left: 46px !important; }
 
-  /* Section row */
   tr.section-row td { background: var(--section-bg); border-bottom: 2px solid var(--section-border); padding: 8px 12px; }
+  tr.section-row td.section-cell { text-align: center; vertical-align: middle; padding: 8px 4px; }
   .section-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--textMuted); display: flex; align-items: center; gap: 6px; }
 
-  /* Collapsible */
   .collapse-toggle { background: none; border: none; cursor: pointer; color: var(--textMuted); font-size: 10px; font-family: inherit; padding: 2px 4px; transition: transform .2s; display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 3px; }
   .collapse-toggle:hover { background: var(--accent); color: var(--textStrong); }
   .collapse-toggle.collapsed { transform: rotate(-90deg); }
 
-  /* Cell chips */
   .chip { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 600; }
   .chip.done { background: var(--done-bg); border: 1px solid var(--done-border); color: var(--done-text); }
   .chip.active { background: var(--active-bg); border: 1px solid var(--active-border); color: var(--active-text); }
@@ -105,17 +99,13 @@
   .chip.review { background: var(--review-bg); border: 1px solid var(--review-border); color: var(--review-text); }
   .chip.kommt { background: var(--kommt-bg); border: 1px solid var(--kommt-border); color: var(--kommt-text); }
 
-  /* Dot */
   .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
   .dot.done { background: var(--done-text); }
   .dot.active { background: var(--active-text); }
   .dot.blocked { background: var(--blocked-text); }
   .dot.review { background: var(--review-text); }
   .dot.kommt { background: var(--kommt-text); }
-  .dot.mixed { background: conic-gradient(var(--active-text) 0% 33%, var(--blocked-text) 33% 66%, var(--review-text) 66% 100%); }
 
-  /* Popup */
-  .popup-overlay { position: fixed; inset: 0; z-index: 99; }
   .popup { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: var(--popBg); border: 1px solid var(--borderStrong); border-radius: 8px; padding: 10px; z-index: 100; min-width: 190px; box-shadow: 0 8px 28px var(--shadow); }
   .popup-label { font-size: 9px; color: var(--textMuted); letter-spacing: 1px; margin-bottom: 5px; }
   .popup-btn { display: block; width: 100%; padding: 4px 8px; background: transparent; border: 1px solid var(--border); border-radius: 3px; cursor: pointer; font-size: 11px; font-family: inherit; text-align: left; margin-bottom: 2px; }
@@ -124,62 +114,43 @@
   .popup-person.selected { background: var(--accent); color: var(--textStrong); }
   .popup-person.suggested { border-color: var(--review-border); background: var(--review-bg); color: var(--review-text); }
 
-  /* Modal */
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; z-index: 1000; }
   .modal { background: var(--popBg); border: 1px solid var(--borderStrong); border-radius: 8px; padding: 24px; min-width: 280px; max-width: 400px; box-shadow: 0 12px 40px var(--shadow); }
   .modal h3 { margin-bottom: 10px; font-weight: 600; color: var(--textStrong); font-size: 13px; }
   .modal p { font-size: 11px; color: var(--textMuted); margin-bottom: 10px; }
+  .modal .hint { font-size: 9px; color: var(--textFaint); margin-top: 6px; }
   input.field { padding: 5px 8px; background: var(--bg); border: 1px solid var(--borderStrong); border-radius: 4px; color: var(--textStrong); font-size: 11px; font-family: inherit; outline: none; width: 100%; }
+  input.field:focus { border-color: var(--review-border); box-shadow: 0 0 0 2px var(--review-bg); }
   .modal-actions { display: flex; gap: 6px; margin-top: 12px; justify-content: flex-end; }
   .modal-btn { padding: 5px 14px; border-radius: 4px; cursor: pointer; font-size: 11px; font-family: inherit; border: 1px solid var(--borderStrong); background: var(--accent); color: var(--textStrong); }
   .modal-btn.primary { background: var(--done-bg); border-color: var(--done-border); color: var(--done-text); }
   .modal-btn.danger { background: var(--blocked-bg); border-color: var(--blocked-border); color: var(--blocked-text); }
 
-  /* Progress */
   .progress-bar { height: 5px; background: var(--accent); border-radius: 3px; overflow: hidden; }
   .progress-fill { height: 100%; border-radius: 3px; transition: width .4s; }
   .mini-bar { display: flex; align-items: center; gap: 5px; }
   .mini-track { height: 3px; width: 44px; background: var(--accent); border-radius: 2px; overflow: hidden; }
 
-  /* Cards */
   .section-title { font-size: 13px; font-weight: 700; color: var(--textStrong); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
   .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
   .card { background: var(--bgCard); border: 1px solid var(--border); border-radius: 8px; padding: 18px; }
   .next-row { display: flex; align-items: center; gap: 10px; padding: 9px 14px; background: var(--bgCard); border: 1px solid var(--border); border-radius: 5px; margin-bottom: 5px; }
 
-  /* Team bar */
   .team-bar { margin-top: 16px; padding: 12px; background: var(--bgCard); border-radius: 6px; border: 1px solid var(--border); }
   .team-tag { padding: 3px 8px; background: var(--accent); border: 1px solid var(--borderStrong); border-radius: 4px; display: inline-flex; align-items: center; gap: 5px; font-size: 11px; }
 
-  /* Saving indicator */
   .save-indicator { position: fixed; bottom: 16px; right: 16px; padding: 6px 14px; background: var(--done-bg); border: 1px solid var(--done-border); color: var(--done-text); border-radius: 6px; font-size: 11px; font-family: inherit; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 200; }
   .save-indicator.show { opacity: 1; }
 
   .repeat-badge { font-size: 8px; color: var(--review-text); border: 1px solid var(--review-border); border-radius: 2px; padding: 0 3px; line-height: 14px; }
   .sub-arrow { color: var(--textFaint); margin-right: 3px; }
-
-  /* Rename input inline */
-  .rename-input { background: var(--bg); border: 1px solid var(--borderStrong); border-radius: 3px; color: var(--textStrong); font-size: 11px; font-family: inherit; padding: 2px 5px; outline: none; width: 100%; }
-  .rename-input:focus { border-color: var(--review-border); box-shadow: 0 0 0 2px var(--review-bg); }
-
-  /* Scroll spacer */
   .scroll-spacer { pointer-events: none; }
 
-  /* Section indicator dot in header */
-  .section-indicator { display: inline-flex; gap: 2px; margin-left: 4px; }
-
-  /* Add buttons in header row */
   .add-section-btn { background: none; border: 1px dashed var(--borderStrong); color: var(--textFaint); cursor: pointer; font-size: 11px; padding: 2px 8px; border-radius: 3px; font-family: inherit; margin-left: 6px; }
   .add-section-btn:hover { color: var(--textStrong); border-color: var(--textMuted); }
   .add-step-btn { background: none; border: 1px dashed var(--borderStrong); color: var(--textFaint); cursor: pointer; font-size: 9px; padding: 1px 6px; border-radius: 3px; font-family: inherit; }
   .add-step-btn:hover { color: var(--textStrong); border-color: var(--textMuted); }
 
-  /* Name suggestion dropdown */
-  .name-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: var(--popBg); border: 1px solid var(--borderStrong); border-radius: 4px; box-shadow: 0 4px 12px var(--shadow); z-index: 1001; max-height: 120px; overflow-y: auto; }
-  .name-suggestion { padding: 4px 8px; cursor: pointer; font-size: 11px; font-family: inherit; color: var(--text); }
-  .name-suggestion:hover { background: var(--accent); color: var(--textStrong); }
-
-  /* Responsive */
   @media (max-width: 640px) {
     .header { padding: 10px 12px; }
     .content { padding: 10px 12px; }
@@ -188,1103 +159,432 @@
 </style>
 </head>
 <body>
-
 <div id="app"></div>
-
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDrLP5LF4OmjAkyn6O0o8d6bLqu0VqtDfs",
-  authDomain: "lop-tool.firebaseapp.com",
-  projectId: "lop-tool",
-  storageBucket: "lop-tool.firebasestorage.app",
-  messagingSenderId: "137174368951",
-  appId: "1:137174368951:web:1bdf9e3d7100789f9f4332"
-};
-
+const firebaseConfig={apiKey:"AIzaSyDrLP5LF4OmjAkyn6O0o8d6bLqu0VqtDfs",authDomain:"lop-tool.firebaseapp.com",projectId:"lop-tool",storageBucket:"lop-tool.firebasestorage.app",messagingSenderId:"137174368951",appId:"1:137174368951:web:1bdf9e3d7100789f9f4332"};
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-const provider = new firebase.auth.GoogleAuthProvider();
-
-const STATUS_LABELS = { none: "—", done: "Erledigt", active: "In Arbeit", blocked: "Blockiert", review: "Review", kommt: "Kommt" };
-const uid = () => Math.random().toString(36).slice(2, 9);
-
-const DEFAULT_STEPS = [
-  { id:"s1", name:"CAD-Anpassungen", repeatable:false, sectionId:"sec1", substeps:[{id:"s1a",name:"Modell"},{id:"s1b",name:"Zeichnung"}] },
-  { id:"s2", name:"Toleranz-Analyse", repeatable:false, sectionId:"sec1", substeps:[{id:"s2a",name:"Skizzen-Modell"},{id:"s2b",name:"Skizzen-Zeichnung"},{id:"s2c",name:"Toleranz-Berechnung"},{id:"s2d",name:"Toleranz-Auswertung"}] },
-  { id:"s3", name:"CAD-Daten-Erstellung", repeatable:false, sectionId:"sec1", substeps:[{id:"s3a",name:"Anforderungen-Übernahme"},{id:"s3b",name:"Toleranz-Übernahme"},{id:"s3c",name:"Kollisions-Prüfung"},{id:"s3d",name:"Modell-Bemaßung"},{id:"s3e",name:"Prüfmaße"}] },
-  { id:"s4", name:"SAP-Pflege", repeatable:false, sectionId:"sec2", substeps:[{id:"s4a",name:"Teile-Guss"},{id:"s4b",name:"Teile-Fräs"},{id:"s4c",name:"Teile-Verbindung"},{id:"s4d",name:"Teile-Dichtung"}] },
-  { id:"s5", name:"CAD-Daten-Ablage", repeatable:false, sectionId:"sec2", substeps:[] },
-  { id:"s6", name:"3D-Druck/Prüfung", repeatable:true, sectionId:"sec3", substeps:[{id:"s6a",name:"Daten-Abgabe"},{id:"s6b",name:"Druck-Erfolgreich"},{id:"s6c",name:"Bearbeitung-Erfolgreich"},{id:"s6d",name:"Druck-Verbaut/Analysiert"}] },
-  { id:"s7", name:"Prüfzeichnungen", repeatable:false, sectionId:"sec3", substeps:[{id:"s7a",name:"Daten-Abgabe"},{id:"s7b",name:"Prüfzeichnungen-Erstellt"}] },
-  { id:"s8", name:"Lieferung", repeatable:false, sectionId:"sec3", substeps:[{id:"s8a",name:"Anfrage / Daten-Abgabe"},{id:"s8b",name:"RM-Erhalt"},{id:"s8c",name:"RM-Bearbeitet"},{id:"s8d",name:"Bestellung / Daten-Abgabe"}] },
+const auth=firebase.auth(),db=firebase.firestore(),provider=new firebase.auth.GoogleAuthProvider();
+const STATUS_LABELS={none:"—",done:"Erledigt",active:"In Arbeit",blocked:"Blockiert",review:"Review",kommt:"Kommt"};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const DEFAULT_STEPS=[
+  {id:"s1",name:"CAD-Anpassungen",repeatable:false,sectionId:"sec1",substeps:[{id:"s1a",name:"Modell"},{id:"s1b",name:"Zeichnung"}]},
+  {id:"s2",name:"Toleranz-Analyse",repeatable:false,sectionId:"sec1",substeps:[{id:"s2a",name:"Skizzen-Modell"},{id:"s2b",name:"Skizzen-Zeichnung"},{id:"s2c",name:"Toleranz-Berechnung"},{id:"s2d",name:"Toleranz-Auswertung"}]},
+  {id:"s3",name:"CAD-Daten-Erstellung",repeatable:false,sectionId:"sec1",substeps:[{id:"s3a",name:"Anforderungen-Übernahme"},{id:"s3b",name:"Toleranz-Übernahme"},{id:"s3c",name:"Kollisions-Prüfung"},{id:"s3d",name:"Modell-Bemaßung"},{id:"s3e",name:"Prüfmaße"}]},
+  {id:"s4",name:"SAP-Pflege",repeatable:false,sectionId:"sec2",substeps:[{id:"s4a",name:"Teile-Guss"},{id:"s4b",name:"Teile-Fräs"},{id:"s4c",name:"Teile-Verbindung"},{id:"s4d",name:"Teile-Dichtung"}]},
+  {id:"s5",name:"CAD-Daten-Ablage",repeatable:false,sectionId:"sec2",substeps:[]},
+  {id:"s6",name:"3D-Druck/Prüfung",repeatable:true,sectionId:"sec3",substeps:[{id:"s6a",name:"Daten-Abgabe"},{id:"s6b",name:"Druck-Erfolgreich"},{id:"s6c",name:"Bearbeitung-Erfolgreich"},{id:"s6d",name:"Druck-Verbaut/Analysiert"}]},
+  {id:"s7",name:"Prüfzeichnungen",repeatable:false,sectionId:"sec3",substeps:[{id:"s7a",name:"Daten-Abgabe"},{id:"s7b",name:"Prüfzeichnungen-Erstellt"}]},
+  {id:"s8",name:"Lieferung",repeatable:false,sectionId:"sec3",substeps:[{id:"s8a",name:"Anfrage / Daten-Abgabe"},{id:"s8b",name:"RM-Erhalt"},{id:"s8c",name:"RM-Bearbeitet"},{id:"s8d",name:"Bestellung / Daten-Abgabe"}]},
 ];
-const DEFAULT_SECTIONS = [
-  { id:"sec1", name:"Konstruktion" },
-  { id:"sec2", name:"Datenpflege" },
-  { id:"sec3", name:"Fertigung & Lieferung" },
-];
-const DEFAULT_CONSTRUCTIONS = [{id:"c1",name:"NM 045"},{id:"c2",name:"NM 011"},{id:"c3",name:"NM 021"},{id:"c4",name:"NM 031"}];
-const DEFAULT_TEAM = ["OZ","REV","Wladi","Sabrina"];
+const DEFAULT_SECTIONS=[{id:"sec1",name:"Konstruktion"},{id:"sec2",name:"Datenpflege"},{id:"sec3",name:"Fertigung & Lieferung"}];
+const DEFAULT_CONSTRUCTIONS=[{id:"c1",name:"NM 045"},{id:"c2",name:"NM 011"},{id:"c3",name:"NM 021"},{id:"c4",name:"NM 031"}];
+const DEFAULT_TEAM=["OZ","REV","Wladi","Sabrina"];
 
-// ─── App State ───
-let state = {
-  user: null,
-  steps: DEFAULT_STEPS,
-  sections: DEFAULT_SECTIONS,
-  constructions: DEFAULT_CONSTRUCTIONS,
-  team: DEFAULT_TEAM,
-  matrix: {},
-  view: "matrix",
-  theme: "light",
-  editMode: false,
-  activeCell: null,
-  collapsed: {},
-  collapsedSections: {},
-  saving: false,
-  showSaved: false,
-  renaming: null, // {type, id, parentId?, originalName}
-  modal: null,
-};
+let state={user:null,steps:DEFAULT_STEPS,sections:DEFAULT_SECTIONS,constructions:DEFAULT_CONSTRUCTIONS,team:DEFAULT_TEAM,matrix:{},view:"matrix",theme:"light",editMode:false,activeCell:null,collapsed:{},collapsedSections:{},saving:false,showSaved:false,modal:null};
+let saveTimeout=null,unsubscribe=null,pendingSave=false;
 
-let saveTimeout = null;
-let unsubscribe = null;
-let pendingSave = false;
+// ─── Undo ───
+const MAX_UNDO=10;
+let undoStack=[];
+function pushUndo(){undoStack.push(JSON.stringify({steps:state.steps,sections:state.sections,constructions:state.constructions,team:state.team,matrix:state.matrix}));if(undoStack.length>MAX_UNDO)undoStack.shift();}
+function performUndo(){if(!undoStack.length)return;const s=JSON.parse(undoStack.pop());state.steps=s.steps;state.sections=s.sections;state.constructions=s.constructions;state.team=s.team;state.matrix=s.matrix;saveData();render();}
+document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="z"&&!e.target.closest("input,textarea,select")){e.preventDefault();performUndo();}});
 
-// ─── Undo Stack ───
-const MAX_UNDO = 10;
-let undoStack = [];
-
-function pushUndo() {
-  const snapshot = JSON.stringify({
-    steps: state.steps,
-    sections: state.sections,
-    constructions: state.constructions,
-    team: state.team,
-    matrix: state.matrix,
-  });
-  undoStack.push(snapshot);
-  if (undoStack.length > MAX_UNDO) undoStack.shift();
-}
-
-function performUndo() {
-  if (undoStack.length === 0) return;
-  const snapshot = JSON.parse(undoStack.pop());
-  state.steps = snapshot.steps;
-  state.sections = snapshot.sections;
-  state.constructions = snapshot.constructions;
-  state.team = snapshot.team;
-  state.matrix = snapshot.matrix;
-  saveData();
-  render();
-}
-
-// Ctrl+Z handler
-document.addEventListener("keydown", e => {
-  if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.target.closest("input,textarea")) {
-    e.preventDefault();
-    performUndo();
-  }
-});
-
-// ─── Firebase Sync ───
-function docRef() { return db.collection("tracker").doc("shared"); }
-
-function loadData() {
-  if (unsubscribe) unsubscribe();
-  unsubscribe = docRef().onSnapshot(snap => {
-    if (pendingSave) return;
-    if (snap.exists) {
-      const d = snap.data();
-      if (d.steps) {
-        state.steps = d.steps;
-        state.steps.forEach(s => { if(!s.sectionId) s.sectionId = "sec_unsorted"; });
-      }
-      if (d.sections) state.sections = d.sections;
-      if (d.constructions) state.constructions = d.constructions;
-      if (d.team) state.team = d.team;
-      if (d.matrix) state.matrix = d.matrix;
+// ─── Firebase ───
+function docRef(){return db.collection("tracker").doc("shared");}
+function loadData(){
+  if(unsubscribe)unsubscribe();
+  unsubscribe=docRef().onSnapshot(snap=>{
+    if(pendingSave)return;
+    if(snap.exists){
+      const d=snap.data();
+      if(d.steps){state.steps=d.steps;state.steps.forEach(s=>{if(!s.sectionId)s.sectionId="sec_unsorted";});}
+      if(d.sections)state.sections=d.sections;
+      if(d.constructions)state.constructions=d.constructions;
+      if(d.team)state.team=d.team;
+      if(d.matrix)state.matrix=d.matrix;
       render();
     }
   });
 }
-
-function saveData() {
-  clearTimeout(saveTimeout);
-  pendingSave = true;
-  saveTimeout = setTimeout(async () => {
-    state.saving = true; render();
-    try {
-      await docRef().set({
-        steps: state.steps,
-        sections: state.sections || [],
-        constructions: state.constructions,
-        team: state.team,
-        matrix: state.matrix,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        updatedBy: state.user?.displayName || "unknown",
-      });
-    } catch(e) { console.error("Save error:", e); }
-    pendingSave = false;
-    state.saving = false;
-    state.showSaved = true; render();
-    setTimeout(() => { state.showSaved = false; render(); }, 1500);
-  }, 500);
+function saveData(){
+  clearTimeout(saveTimeout);pendingSave=true;
+  saveTimeout=setTimeout(async()=>{
+    state.saving=true;render();
+    try{await docRef().set({steps:state.steps,sections:state.sections||[],constructions:state.constructions,team:state.team,matrix:state.matrix,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:state.user?.displayName||"unknown"});}catch(e){console.error("Save error:",e);}
+    pendingSave=false;state.saving=false;state.showSaved=true;render();
+    setTimeout(()=>{state.showSaved=false;render();},1500);
+  },500);
 }
 
-// ─── Cell Helpers (single block per cell now) ───
-function ck(cid, sid) { return cid+"::"+sid; }
+// ─── Cell Helpers ───
+function ck(cid,sid){return cid+"::"+sid;}
+function getCell(cid,sid){return state.matrix[ck(cid,sid)]||{status:"none",person:""};}
+function setCell(cid,sid,data){pushUndo();state.matrix[ck(cid,sid)]=data;state.activeCell=null;saveData();render();}
+function getAllIds(steps){const ids=[];steps.forEach(s=>{ids.push(s.id);(s.substeps||[]).forEach(ss=>ids.push(ss.id));});return ids;}
 
-function getCell(cid, sid) {
-  return state.matrix[ck(cid, sid)] || {status:"none", person:""};
+function getProgress(cid){
+  const ids=getAllIds(state.steps);if(!ids.length)return{done:0,active:0,blocked:0,review:0,kommt:0,pct:0,total:0};
+  let d=0,a=0,b=0,r=0,k=0,counted=0;
+  ids.forEach(sid=>{const c=getCell(cid,sid);if(c.status==="none")return;counted++;if(c.status==="done")d++;if(c.status==="active")a++;if(c.status==="blocked")b++;if(c.status==="review")r++;if(c.status==="kommt")k++;});
+  return{done:d,active:a,blocked:b,review:r,kommt:k,pct:counted?Math.round(d/counted*100):0,total:counted};
 }
 
-function setCell(cid, sid, data) {
-  pushUndo();
-  state.matrix[ck(cid, sid)] = data;
-  state.activeCell = null;
-  saveData();
-  render();
+function getSectionStatus(sectionId,cid){
+  const ss=state.steps.filter(s=>s.sectionId===sectionId);if(!ss.length)return"none";
+  const st=new Set();
+  ss.forEach(step=>{[step.id,...(step.substeps||[]).map(x=>x.id)].forEach(sid=>{const c=getCell(cid,sid);if(c.status!=="none")st.add(c.status);});});
+  if(!st.size)return"none";if(st.size===1&&st.has("done"))return"done";if(st.has("blocked"))return"blocked";if(st.has("active"))return"active";if(st.has("review"))return"review";if(st.has("kommt"))return"kommt";return"active";
 }
 
-function getAllIds(steps) {
-  const ids = [];
-  steps.forEach(s => { ids.push(s.id); (s.substeps||[]).forEach(ss => ids.push(ss.id)); });
-  return ids;
-}
-
-function getProgress(cid) {
-  const ids = getAllIds(state.steps);
-  if (!ids.length) return {done:0, active:0, blocked:0, review:0, kommt:0, pct:0, total:0};
-  let d=0, a=0, b=0, r=0, k=0, counted=0;
-  ids.forEach(sid => {
-    const c = getCell(cid, sid);
-    if(c.status === "none") return; // Don't count "-"
-    counted++;
-    if(c.status==="done") d++;
-    if(c.status==="active") a++;
-    if(c.status==="blocked") b++;
-    if(c.status==="review") r++;
-    if(c.status==="kommt") k++;
-  });
-  const pct = counted > 0 ? Math.round(d/counted*100) : 0;
-  return {done:d, active:a, blocked:b, review:r, kommt:k, pct, total:counted};
-}
-
-// Section indicator: aggregate status of all main steps in section
-function getSectionIndicator(sectionId) {
-  const sectionSteps = state.steps.filter(s => s.sectionId === sectionId);
-  if (!sectionSteps.length) return "none";
-  const statuses = new Set();
-  sectionSteps.forEach(step => {
-    const ids = [step.id, ...(step.substeps||[]).map(ss => ss.id)];
-    ids.forEach(sid => {
-      state.constructions.forEach(con => {
-        const c = getCell(con.id, sid);
-        if (c.status !== "none") statuses.add(c.status);
-      });
-    });
-  });
-  if (statuses.size === 0) return "none";
-  if (statuses.has("blocked")) return "blocked";
-  if (statuses.has("active")) return "active";
-  if (statuses.has("review")) return "review";
-  if (statuses.has("kommt") && !statuses.has("done")) return "kommt";
-  if (statuses.size === 1 && statuses.has("done")) return "done";
-  return "active";
-}
-
-function findName(sid) {
-  for(const s of state.steps) {
-    if(s.id===sid) return s.name;
-    for(const ss of (s.substeps||[])) if(ss.id===sid) return s.name+" → "+ss.name;
-  }
-  return sid;
-}
-
-function getSuggestedPerson(sid, currentCid) {
-  const persons = {};
-  state.constructions.forEach(con => {
-    if(con.id === currentCid) return;
-    const c = getCell(con.id, sid);
-    if(c.person) persons[c.person] = (persons[c.person]||0) + 1;
-  });
-  let best = null, bestCount = 0;
-  Object.entries(persons).forEach(([p,c]) => { if(c > bestCount) { best = p; bestCount = c; } });
-  return best;
-}
+function findName(sid){for(const s of state.steps){if(s.id===sid)return s.name;for(const ss of(s.substeps||[]))if(ss.id===sid)return s.name+" → "+ss.name;}return sid;}
+function getSuggestedPerson(sid,currentCid){const p={};state.constructions.forEach(con=>{if(con.id===currentCid)return;const c=getCell(con.id,sid);if(c.person)p[c.person]=(p[c.person]||0)+1;});let best=null,bc=0;Object.entries(p).forEach(([k,v])=>{if(v>bc){best=k;bc=v;}});return best;}
 
 // ─── Duplication ───
-function duplicateSection(section) {
-  pushUndo();
-  const newSecId = "sec_" + uid();
-  const newSec = { id: newSecId, name: section.name + " (Kopie)" };
-  const idx = state.sections.indexOf(section);
-  state.sections.splice(idx + 1, 0, newSec);
-  // Duplicate all steps in this section
-  const sectionSteps = state.steps.filter(s => s.sectionId === section.id);
-  let insertIdx = state.steps.indexOf(sectionSteps[sectionSteps.length - 1]) + 1;
-  if (sectionSteps.length === 0) insertIdx = state.steps.length;
-  sectionSteps.forEach(step => {
-    const newStep = duplicateStepData(step, newSecId);
-    state.steps.splice(insertIdx++, 0, newStep);
-  });
-  saveData(); render();
-}
+function cloneStep(step,secId){return{id:"s_"+uid(),name:step.name+" (Kopie)",repeatable:step.repeatable,sectionId:secId,substeps:(step.substeps||[]).map(ss=>({id:"ss_"+uid(),name:ss.name}))};}
+function duplicateSection(sec){pushUndo();const nid="sec_"+uid();const idx=state.sections.indexOf(sec);state.sections.splice(idx+1,0,{id:nid,name:sec.name+" (Kopie)"});const ss=state.steps.filter(s=>s.sectionId===sec.id);let ins=ss.length?state.steps.indexOf(ss[ss.length-1])+1:state.steps.length;ss.forEach(s=>{state.steps.splice(ins++,0,cloneStep(s,nid));});saveData();render();}
+function duplicateStep(step){pushUndo();const idx=state.steps.indexOf(step);state.steps.splice(idx+1,0,cloneStep(step,step.sectionId));saveData();render();}
+function duplicateSubstep(step,sub){pushUndo();const idx=step.substeps.indexOf(sub);step.substeps.splice(idx+1,0,{id:"ss_"+uid(),name:sub.name+" (Kopie)"});saveData();render();}
 
-function duplicateStep(step) {
-  pushUndo();
-  const newStep = duplicateStepData(step, step.sectionId);
-  const idx = state.steps.indexOf(step);
-  state.steps.splice(idx + 1, 0, newStep);
-  saveData(); render();
-}
+function confirmDelete(title,desc,fn){state.modal={type:"confirm",title,description:desc,onConfirm:fn};render();}
 
-function duplicateStepData(step, sectionId) {
-  const newStepId = "s_" + uid();
-  const newSubsteps = (step.substeps || []).map(ss => ({
-    id: "ss_" + uid(),
-    name: ss.name,
-  }));
-  return {
-    id: newStepId,
-    name: step.name + " (Kopie)",
-    repeatable: step.repeatable,
-    sectionId: sectionId,
-    substeps: newSubsteps,
-  };
-}
-
-function duplicateSubstep(step, sub) {
-  pushUndo();
-  const newSub = { id: "ss_" + uid(), name: sub.name + " (Kopie)" };
-  const idx = step.substeps.indexOf(sub);
-  step.substeps.splice(idx + 1, 0, newSub);
-  saveData(); render();
-}
-
-// ─── Confirm Delete ───
-function confirmDelete(title, description, onConfirm) {
-  state.modal = { type: "confirm", title, description, onConfirm };
-  render();
-}
-
-// ─── Render ───
-function h(tag, attrs, ...children) {
-  const el = document.createElement(tag);
-  if(attrs) Object.entries(attrs).forEach(([k,v]) => {
-    if(k==="className") el.className = v;
-    else if(k.startsWith("on")) el.addEventListener(k.slice(2).toLowerCase(), v);
-    else if(k==="style" && typeof v==="object") Object.assign(el.style, v);
-    else el.setAttribute(k, v);
-  });
-  children.flat(9).forEach(c => { if(c==null) return; el.appendChild(typeof c==="string" ? document.createTextNode(c) : c); });
+// ─── DOM ───
+function h(tag,attrs,...children){
+  const el=document.createElement(tag);
+  if(attrs)Object.entries(attrs).forEach(([k,v])=>{if(v===null||v===undefined||v===false)return;if(k==="className")el.className=v;else if(k.startsWith("on"))el.addEventListener(k.slice(2).toLowerCase(),v);else if(k==="style"&&typeof v==="object")Object.assign(el.style,v);else el.setAttribute(k,v);});
+  children.flat(9).forEach(c=>{if(c==null)return;el.appendChild(typeof c==="string"?document.createTextNode(c):c);});
   return el;
 }
 
-// Track scroll position to prevent jumps
-let savedScrollTop = null;
-
-function render() {
-  // Save scroll position before re-render
-  savedScrollTop = window.scrollY;
-
-  document.body.setAttribute("data-theme", state.theme);
-  const app = document.getElementById("app");
-  app.innerHTML = "";
-  if(!state.user) { app.appendChild(renderLogin()); return; }
+// ─── Render ───
+function render(){
+  const scrollY=window.scrollY;
+  document.body.setAttribute("data-theme",state.theme);
+  const app=document.getElementById("app");
+  app.innerHTML="";
+  if(!state.user){app.appendChild(renderLogin());return;}
   app.appendChild(renderHeader());
-  const content = h("div", {className:"content"});
-  if(state.view==="matrix") content.appendChild(renderMatrix());
-  else if(state.view==="dashboard") content.appendChild(renderDashboard());
-  else if(state.view==="tasks") content.appendChild(renderTasks());
+  const content=h("div",{className:"content"});
+  if(state.view==="matrix")content.appendChild(renderMatrix());
+  else if(state.view==="dashboard")content.appendChild(renderDashboard());
+  else if(state.view==="tasks")content.appendChild(renderTasks());
   app.appendChild(content);
-
-  // Save indicator
-  app.appendChild(h("div", {className:"save-indicator"+(state.showSaved?" show":"")}, "✓ Gespeichert"));
-
-  // Modal
-  if(state.modal) app.appendChild(renderModal());
-
-  // Restore scroll position after render
-  if (savedScrollTop !== null) {
-    requestAnimationFrame(() => {
-      window.scrollTo(0, savedScrollTop);
-    });
-  }
-
-  // Add scroll spacer for matrix view
-  if(state.view==="matrix") {
-    requestAnimationFrame(() => addScrollSpacer());
-  }
+  if(state.view==="matrix")content.appendChild(h("div",{className:"scroll-spacer",style:{height:Math.max(0,window.innerHeight-100)+"px"}}));
+  app.appendChild(h("div",{className:"save-indicator"+(state.showSaved?" show":"")}, "✓ Gespeichert"));
+  if(state.modal)app.appendChild(renderModal());
+  window.scrollTo(0,scrollY);
 }
 
-function addScrollSpacer() {
-  // Remove existing spacer
-  const existing = document.getElementById("scroll-spacer");
-  if (existing) existing.remove();
-  // Add spacer so user can scroll until bottom row is at top of viewport
-  const content = document.querySelector(".content");
-  if (!content) return;
-  const spacer = document.createElement("div");
-  spacer.id = "scroll-spacer";
-  spacer.className = "scroll-spacer";
-  spacer.style.height = Math.max(0, window.innerHeight - 100) + "px";
-  content.appendChild(spacer);
-}
-
-function renderLogin() {
-  return h("div", {className:"login-screen"},
-    h("div", {style:{width:"7px",height:"7px",borderRadius:"50%",background:"var(--done-text)",boxShadow:"0 0 6px var(--done-text)"}}),
-    h("h1", null, "Konstruktion Tracker"),
-    h("button", {className:"login-btn", onClick:() => auth.signInWithPopup(provider)},
-      h("span", null, "🔐"),
-      h("span", null, "Mit Google anmelden")
-    ),
-    h("p", {style:{color:"var(--textMuted)",fontSize:"11px",maxWidth:"300px",textAlign:"center"}}, "Alle Teammitglieder melden sich mit ihrem Google-Konto an und arbeiten in Echtzeit zusammen.")
+function renderLogin(){
+  return h("div",{className:"login-screen"},
+    h("div",{style:{width:"7px",height:"7px",borderRadius:"50%",background:"var(--done-text)",boxShadow:"0 0 6px var(--done-text)"}}),
+    h("h1",null,"Konstruktion Tracker"),
+    h("button",{className:"login-btn",onClick:()=>auth.signInWithPopup(provider)},h("span",null,"🔐"),h("span",null,"Mit Google anmelden")),
+    h("p",{style:{color:"var(--textMuted)",fontSize:"11px",maxWidth:"300px",textAlign:"center"}},"Alle Teammitglieder melden sich mit ihrem Google-Konto an und arbeiten in Echtzeit zusammen.")
   );
 }
 
-function renderHeader() {
-  const views = [{key:"matrix",label:"Matrix"},{key:"dashboard",label:"Dashboard"},{key:"tasks",label:"Aufgaben"}];
-  return h("div", {className:"header"},
-    h("div", {className:"header-title"},
-      h("div", {className:"header-dot"}),
-      "Konstruktion Tracker"
-    ),
-    h("div", {className:"header-actions"},
-      h("div", {className:"user-info"},
-        state.user.photoURL ? h("img", {className:"user-avatar", src:state.user.photoURL}) : null,
-        state.user.displayName || state.user.email
-      ),
-      ...views.map(v => h("button", {className:"btn"+(state.view===v.key?" active":""), onClick:() => {state.view=v.key; render();}}, v.label)),
-      h("div", {className:"divider"}),
-      h("button", {className:"btn-undo", disabled: undoStack.length === 0 ? "disabled" : undefined, onClick:() => performUndo(), title:"Rückgängig (Ctrl+Z)"}, "↩ Zurück"),
-      h("button", {className:"btn-theme", onClick:() => {state.theme = state.theme==="dark"?"light":"dark"; render();}}, state.theme==="dark"?"☀":"☾"),
-      h("button", {className:"btn-editmode "+(state.editMode?"on":"off"), onClick:() => {state.editMode=!state.editMode; state.renaming=null; render();}}, state.editMode?"✕ Fertig":"✎ Bearbeiten"),
-      h("button", {className:"btn-logout", onClick:() => auth.signOut()}, "Abmelden")
+function renderHeader(){
+  const views=[{key:"matrix",label:"Matrix"},{key:"dashboard",label:"Dashboard"},{key:"tasks",label:"Aufgaben"}];
+  return h("div",{className:"header"},
+    h("div",{className:"header-title"},h("div",{className:"header-dot"}),"Konstruktion Tracker"),
+    h("div",{className:"header-actions"},
+      h("div",{className:"user-info"},state.user.photoURL?h("img",{className:"user-avatar",src:state.user.photoURL}):null,state.user.displayName||state.user.email),
+      ...views.map(v=>h("button",{className:"btn"+(state.view===v.key?" active":""),onClick:()=>{state.view=v.key;render();}},v.label)),
+      h("div",{className:"divider"}),
+      h("button",{className:"btn-undo"+(undoStack.length?"":" is-disabled"),onClick:()=>performUndo(),title:"Rückgängig (Ctrl+Z)"},"↩ Zurück"),
+      h("button",{className:"btn-theme",onClick:()=>{state.theme=state.theme==="dark"?"light":"dark";render();}},state.theme==="dark"?"☀":"☾"),
+      h("button",{className:"btn-editmode "+(state.editMode?"on":"off"),onClick:()=>{state.editMode=!state.editMode;render();}},state.editMode?"✕ Fertig":"✎ Bearbeiten"),
+      h("button",{className:"btn-logout",onClick:()=>auth.signOut()},"Abmelden")
     )
   );
 }
 
 // ─── Modal ───
-function showModal(config) {
-  state.modal = config;
-  render();
-  setTimeout(() => {
-    const inp = document.querySelector('.modal input.field');
-    if(inp) { inp.focus(); inp.select(); }
-  }, 50);
-}
-
-function renderModal() {
-  const m = state.modal;
-  if (!m) return h("div");
-
-  if (m.type === "confirm") {
-    return h("div", {className:"modal-bg", onClick:() => { state.modal = null; render(); }},
-      h("div", {className:"modal", onClick:e => e.stopPropagation()},
-        h("h3", null, m.title),
-        m.description ? h("p", null, m.description) : null,
-        h("div", {className:"modal-actions"},
-          h("button", {className:"modal-btn", onClick:() => { state.modal=null; render(); }}, "Abbrechen"),
-          h("button", {className:"modal-btn danger", onClick:() => { m.onConfirm(); state.modal=null; render(); }}, "Löschen")
+function showModal(config){state.modal=config;render();setTimeout(()=>{const inp=document.querySelector('.modal input.field');if(inp){inp.focus();inp.select();}},50);}
+function renderModal(){
+  const m=state.modal;if(!m)return h("div");
+  if(m.type==="confirm"){
+    return h("div",{className:"modal-bg",onClick:()=>{state.modal=null;render();}},
+      h("div",{className:"modal",onClick:e=>e.stopPropagation()},
+        h("h3",null,m.title),m.description?h("p",null,m.description):null,
+        h("div",{className:"modal-actions"},
+          h("button",{className:"modal-btn",onClick:()=>{state.modal=null;render();}},"Abbrechen"),
+          h("button",{className:"modal-btn danger",onClick:()=>{m.onConfirm();state.modal=null;render();}},"Löschen")
         )
       )
     );
   }
-
-  // Input modal
-  return h("div", {className:"modal-bg", onClick:() => { state.modal = null; render(); }},
-    h("div", {className:"modal", onClick:e => e.stopPropagation()},
-      h("h3", null, m.title),
-      m.description ? h("p", null, m.description) : null,
-      h("input", {className:"field", value:m.value||"", id:"modal-input",
-        onInput:e => { state.modal.value = e.target.value; },
-        onKeydown:e => {
-          if(e.key==="Enter") { m.onConfirm(state.modal.value); state.modal=null; render(); }
-          if(e.key==="Escape") { state.modal=null; render(); }
-        }
+  return h("div",{className:"modal-bg",onClick:()=>{state.modal=null;render();}},
+    h("div",{className:"modal",onClick:e=>e.stopPropagation()},
+      h("h3",null,m.title),m.description?h("p",null,m.description):null,
+      h("input",{className:"field",value:m.value||"",id:"modal-input",
+        onInput:e=>{state.modal.value=e.target.value;},
+        onKeydown:e=>{if(e.key==="Enter"){m.onConfirm(state.modal.value);state.modal=null;render();}if(e.key==="Escape"){state.modal=null;render();}}
       }),
-      h("div", {className:"modal-actions"},
-        h("button", {className:"modal-btn", onClick:() => { state.modal=null; render(); }}, "Abbrechen"),
-        h("button", {className:"modal-btn primary", onClick:() => { m.onConfirm(state.modal.value); state.modal=null; render(); }}, "Speichern")
+      h("div",{className:"hint"},"Enter = Speichern · Esc = Abbrechen"),
+      h("div",{className:"modal-actions"},
+        h("button",{className:"modal-btn",onClick:()=>{state.modal=null;render();}},"Abbrechen"),
+        h("button",{className:"modal-btn primary",onClick:()=>{m.onConfirm(state.modal.value);state.modal=null;render();}},"Speichern")
       )
     )
   );
 }
 
-// ─── Inline Renaming ───
-function startRenaming(type, id, parentId) {
-  let originalName = "";
-  if (type === "section") {
-    const sec = state.sections.find(s => s.id === id);
-    if (sec) originalName = sec.name;
-  } else if (type === "step") {
-    const step = state.steps.find(s => s.id === id);
-    if (step) originalName = step.name;
-  } else if (type === "substep") {
-    const step = state.steps.find(s => s.id === parentId);
-    if (step) {
-      const sub = (step.substeps||[]).find(ss => ss.id === id);
-      if (sub) originalName = sub.name;
-    }
-  } else if (type === "construction") {
-    const con = state.constructions.find(c => c.id === id);
-    if (con) originalName = con.name;
-  }
-  state.renaming = { type, id, parentId, originalName };
-  render();
-  setTimeout(() => {
-    const inp = document.getElementById("rename-" + id);
-    if (inp) { inp.focus(); inp.select(); }
-  }, 30);
-}
-
-function commitRename(value) {
-  if (!state.renaming) return;
-  const { type, id, parentId } = state.renaming;
-  const val = value.trim();
-  if (!val) { state.renaming = null; render(); return; }
-  pushUndo();
-  if (type === "section") {
-    const sec = state.sections.find(s => s.id === id);
-    if (sec) sec.name = val;
-  } else if (type === "step") {
-    const step = state.steps.find(s => s.id === id);
-    if (step) step.name = val;
-  } else if (type === "substep") {
-    const step = state.steps.find(s => s.id === parentId);
-    if (step) {
-      const sub = (step.substeps||[]).find(ss => ss.id === id);
-      if (sub) sub.name = val;
-    }
-  } else if (type === "construction") {
-    const con = state.constructions.find(c => c.id === id);
-    if (con) con.name = val;
-  }
-  state.renaming = null;
-  saveData(); render();
-}
-
-function cancelRename() {
-  state.renaming = null;
-  render();
-}
-
-function renderRenameInput(id, currentName) {
-  const inp = h("input", {
-    className: "rename-input",
-    id: "rename-" + id,
-    value: currentName,
-    onKeydown: e => {
-      if (e.key === "Enter") { commitRename(e.target.value); }
-      if (e.key === "Escape") { cancelRename(); }
-      e.stopPropagation();
-    },
-    onBlur: e => { commitRename(e.target.value); },
-    onClick: e => e.stopPropagation(),
-  });
-  return inp;
-}
-
 // ─── Matrix ───
-function renderMatrix() {
-  const frag = document.createDocumentFragment();
-
-  // Legend
-  const legend = h("div", {className:"legend"});
-  ["done","active","blocked","review","kommt"].forEach(k => {
-    legend.appendChild(h("div", {className:"legend-item"},
-      h("div", {className:"legend-swatch", style:{background:"var(--"+k+"-bg)",border:"1px solid var(--"+k+"-border)"}}),
-      h("span", {style:{color:"var(--"+k+"-text)",fontSize:"11px"}}, STATUS_LABELS[k])
-    ));
-  });
+function renderMatrix(){
+  const frag=document.createDocumentFragment();
+  const legend=h("div",{className:"legend"});
+  ["done","active","blocked","review","kommt"].forEach(k=>{legend.appendChild(h("div",{className:"legend-item"},h("div",{className:"legend-swatch",style:{background:"var(--"+k+"-bg)",border:"1px solid var(--"+k+"-border)"}}),h("span",{style:{color:"var(--"+k+"-text)",fontSize:"11px"}},STATUS_LABELS[k])));});
   frag.appendChild(legend);
 
-  // Table
-  const wrapper = h("div", {className:"table-wrap", id:"matrix-wrap"});
-  const table = h("table", null);
-
-  // Header
-  const thead = h("thead", null);
-  const hrow = h("tr", null);
-
-  // "Prozessschritt" header with + button for adding section
-  const thLeft = h("th", {className:"left"});
+  const wrapper=h("div",{className:"table-wrap",id:"matrix-wrap"});
+  const table=h("table",null);
+  const thead=h("thead",null);
+  const hrow=h("tr",null);
+  const thLeft=h("th",{className:"left"});
   thLeft.appendChild(document.createTextNode("Prozessschritt"));
-  if(state.editMode) {
-    thLeft.appendChild(h("button", {className:"add-section-btn", title:"Neuen Abschnitt hinzufügen", onClick:() => showModal({
-      title: "Neuer Abschnitt",
-      value: "",
-      onConfirm: (val) => {
-        if(val.trim()) {
-          pushUndo();
-          if(!state.sections) state.sections = [];
-          state.sections.push({id:"sec_"+uid(), name:val.trim()});
-          saveData(); render();
-        }
-      }
-    })}, "+ Abschnitt"));
-  }
+  if(state.editMode)thLeft.appendChild(h("button",{className:"add-section-btn",title:"Neuen Abschnitt hinzufügen",onClick:()=>showModal({title:"Neuer Abschnitt",value:"",onConfirm:val=>{if(val.trim()){pushUndo();if(!state.sections)state.sections=[];state.sections.push({id:"sec_"+uid(),name:val.trim()});saveData();render();}}})},"+ Abschnitt"));
   hrow.appendChild(thLeft);
 
-  state.constructions.forEach(con => {
-    const th = h("th", {style:{minWidth:"95px",position:"relative"}});
-    if(state.editMode) {
-      const nameWrap = h("div", {style:{display:"flex",alignItems:"center",justifyContent:"center",gap:"3px"}});
-      if (state.renaming && state.renaming.type === "construction" && state.renaming.id === con.id) {
-        nameWrap.appendChild(renderRenameInput(con.id, con.name));
-      } else {
-        nameWrap.appendChild(h("span", {style:{cursor:"pointer"}, onClick:() => startRenaming("construction", con.id)}, con.name));
-        nameWrap.appendChild(h("button", {className:"btn-edit", title:"Umbenennen", onClick:() => startRenaming("construction", con.id)}, "✎"));
-        nameWrap.appendChild(h("button", {className:"btn-edit danger", onClick:() => {
-          pushUndo();
-          state.constructions = state.constructions.filter(c => c.id !== con.id);
-          saveData(); render();
-        }}, "✕"));
-      }
-      th.appendChild(nameWrap);
-    } else {
-      th.appendChild(document.createTextNode(con.name));
-    }
-    const p = getProgress(con.id);
-    const mini = h("div", {className:"mini-bar", style:{marginTop:"3px",justifyContent:"center"}},
-      h("div", {className:"mini-track"}, h("div", {style:{height:"100%",width:p.pct+"%",background:p.pct===100?"var(--done-text)":"var(--active-text)"}})),
-      h("span", {style:{fontSize:"9px",color:"var(--textMuted)"}}, p.pct+"%")
-    );
-    th.appendChild(mini);
+  state.constructions.forEach(con=>{
+    const th=h("th",{style:{minWidth:"95px",position:"relative"}});
+    if(state.editMode){
+      const w=h("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:"3px"}});
+      w.appendChild(h("span",{style:{cursor:"pointer"},onClick:()=>showModal({title:"Konstruktion umbenennen",value:con.name,onConfirm:val=>{if(val.trim()){pushUndo();con.name=val.trim();saveData();render();}}})},con.name));
+      w.appendChild(h("button",{className:"btn-edit",title:"Umbenennen",onClick:()=>showModal({title:"Konstruktion umbenennen",value:con.name,onConfirm:val=>{if(val.trim()){pushUndo();con.name=val.trim();saveData();render();}}})},"✎"));
+      w.appendChild(h("button",{className:"btn-edit danger",onClick:()=>{pushUndo();state.constructions=state.constructions.filter(c=>c.id!==con.id);saveData();render();}},"✕"));
+      th.appendChild(w);
+    }else th.appendChild(document.createTextNode(con.name));
+    const p=getProgress(con.id);
+    th.appendChild(h("div",{className:"mini-bar",style:{marginTop:"3px",justifyContent:"center"}},h("div",{className:"mini-track"},h("div",{style:{height:"100%",width:p.pct+"%",background:p.pct===100?"var(--done-text)":"var(--active-text)"}})),h("span",{style:{fontSize:"9px",color:"var(--textMuted)"}},p.pct+"%")));
     hrow.appendChild(th);
   });
-  if(state.editMode) hrow.appendChild(h("th", null, h("button", {className:"btn-sm", onClick:() => showModal({
-    title: "Neue Konstruktion",
-    value: "",
-    onConfirm: (val) => {
-      if(val.trim()) { pushUndo(); state.constructions.push({id:"c_"+uid(), name:val.trim()}); saveData(); render(); }
+  if(state.editMode)hrow.appendChild(h("th",null,h("button",{className:"btn-sm",onClick:()=>showModal({title:"Neue Konstruktion",value:"",onConfirm:val=>{if(val.trim()){pushUndo();state.constructions.push({id:"c_"+uid(),name:val.trim()});saveData();render();}}})},"+ Konstr.")));
+  thead.appendChild(hrow);table.appendChild(thead);
+
+  const tbody=h("tbody",null);
+  const sections=state.sections||[];
+  const allSecIds=new Set(sections.map(s=>s.id));
+  const unsorted=state.steps.filter(s=>!s.sectionId||!allSecIds.has(s.sectionId));
+
+  sections.forEach((sec,si)=>{
+    const secSteps=state.steps.filter(s=>s.sectionId===sec.id);
+    if(!secSteps.length&&!state.editMode)return;
+    const isCol=state.collapsedSections[sec.id];
+
+    // Section row with individual cells
+    const secRow=h("tr",{className:"section-row"});
+    const secTd=h("td",{className:"indent-section"});
+    const secLabel=h("div",{className:"section-label"});
+    secLabel.appendChild(h("button",{className:"collapse-toggle"+(isCol?" collapsed":""),onClick:()=>{state.collapsedSections[sec.id]=!state.collapsedSections[sec.id];render();}},"▼"));
+    secLabel.appendChild(h("span",{style:{flex:"1"}},sec.name));
+    if(state.editMode){
+      const btns=h("span",{style:{display:"flex",gap:"2px",flexShrink:"0",alignItems:"center"}});
+      if(si>0)btns.appendChild(h("button",{className:"btn-edit",title:"Nach oben",onClick:()=>{pushUndo();[state.sections[si],state.sections[si-1]]=[state.sections[si-1],state.sections[si]];saveData();render();}},"▲"));
+      if(si<sections.length-1)btns.appendChild(h("button",{className:"btn-edit",title:"Nach unten",onClick:()=>{pushUndo();[state.sections[si],state.sections[si+1]]=[state.sections[si+1],state.sections[si]];saveData();render();}},"▼"));
+      btns.appendChild(h("button",{className:"btn-edit",title:"Umbenennen",onClick:()=>showModal({title:"Abschnitt umbenennen",value:sec.name,onConfirm:val=>{if(val.trim()){pushUndo();sec.name=val.trim();saveData();render();}}})},"✎"));
+      btns.appendChild(h("button",{className:"btn-edit",title:"Duplizieren",onClick:()=>duplicateSection(sec)},"⧉"));
+      btns.appendChild(h("button",{className:"btn-edit danger",onClick:()=>{
+        if(secSteps.length)confirmDelete("Abschnitt löschen?","\""+sec.name+"\" enthält "+secSteps.length+" Hauptschritt(e).",()=>{pushUndo();state.steps.forEach(s=>{if(s.sectionId===sec.id)s.sectionId="";});state.sections=state.sections.filter(s=>s.id!==sec.id);saveData();render();});
+        else{pushUndo();state.sections=state.sections.filter(s=>s.id!==sec.id);saveData();render();}
+      }},"✕"));
+      btns.appendChild(h("button",{className:"add-step-btn",title:"Hauptschritt hinzufügen",onClick:()=>showModal({title:"Neuer Hauptschritt in \""+sec.name+"\"",value:"",onConfirm:val=>{if(val.trim()){pushUndo();state.steps.push({id:"s_"+uid(),name:val.trim(),repeatable:false,sectionId:sec.id,substeps:[]});saveData();render();}}})},"+ Schritt"));
+      secLabel.appendChild(btns);
     }
-  })}, "+ Konstr.")));
-  thead.appendChild(hrow);
-  table.appendChild(thead);
+    secLabel.appendChild(h("span",{style:{fontSize:"9px",color:"var(--textFaint)",marginLeft:"6px",flexShrink:"0"}},secSteps.length+" Schritte"));
+    secTd.appendChild(secLabel);secRow.appendChild(secTd);
 
-  // Body - organized by sections
-  const tbody = h("tbody", null);
-  const sections = state.sections || [];
-  const allSectionIds = new Set(sections.map(s => s.id));
-  const unsortedSteps = state.steps.filter(s => !s.sectionId || !allSectionIds.has(s.sectionId));
-
-  sections.forEach((section, secIdx) => {
-    const sectionSteps = state.steps.filter(s => s.sectionId === section.id);
-    if(sectionSteps.length === 0 && !state.editMode) return;
-
-    const isCollapsedSection = state.collapsedSections[section.id];
-    const sectionStatus = getSectionIndicator(section.id);
-
-    // Section header row
-    const secRow = h("tr", {className:"section-row"});
-    const secTd = h("td", {className:"indent-section", colSpan: state.constructions.length + 1 + (state.editMode?1:0)});
-    const secLabel = h("div", {className:"section-label"});
-    secLabel.appendChild(h("button", {className:"collapse-toggle"+(isCollapsedSection?" collapsed":""), onClick:() => {
-      state.collapsedSections[section.id] = !state.collapsedSections[section.id];
-      render();
-    }}, "▼"));
-
-    // Section indicator dot
-    if (sectionStatus !== "none") {
-      secLabel.appendChild(h("span", {className:"dot " + sectionStatus, style:{width:"7px",height:"7px"}}));
-    }
-
-    if(state.editMode) {
-      if (state.renaming && state.renaming.type === "section" && state.renaming.id === section.id) {
-        secLabel.appendChild(renderRenameInput(section.id, section.name));
-      } else {
-        secLabel.appendChild(h("span", {style:{cursor:"pointer",flex:"1"}, onClick:() => startRenaming("section", section.id)}, section.name));
-        const secBtns = h("span", {style:{display:"flex",gap:"2px",flexShrink:"0",alignItems:"center"}});
-        // Move up/down
-        if(secIdx > 0) secBtns.appendChild(h("button", {className:"btn-edit", title:"Nach oben", onClick:() => {
-          pushUndo();
-          [state.sections[secIdx], state.sections[secIdx-1]] = [state.sections[secIdx-1], state.sections[secIdx]];
-          saveData(); render();
-        }}, "▲"));
-        if(secIdx < sections.length-1) secBtns.appendChild(h("button", {className:"btn-edit", title:"Nach unten", onClick:() => {
-          pushUndo();
-          [state.sections[secIdx], state.sections[secIdx+1]] = [state.sections[secIdx+1], state.sections[secIdx]];
-          saveData(); render();
-        }}, "▼"));
-        secBtns.appendChild(h("button", {className:"btn-edit", title:"Umbenennen", onClick:() => startRenaming("section", section.id)}, "✎"));
-        secBtns.appendChild(h("button", {className:"btn-edit", title:"Duplizieren", onClick:() => duplicateSection(section)}, "⧉"));
-        secBtns.appendChild(h("button", {className:"btn-edit danger", onClick:() => {
-          if (sectionSteps.length > 0) {
-            confirmDelete(
-              "Abschnitt löschen?",
-              "\"" + section.name + "\" enthält " + sectionSteps.length + " Hauptschritt(e). Diese werden dem Bereich 'Ohne Abschnitt' zugewiesen.",
-              () => {
-                pushUndo();
-                state.steps.forEach(s => { if(s.sectionId === section.id) s.sectionId = ""; });
-                state.sections = state.sections.filter(s => s.id !== section.id);
-                saveData(); render();
-              }
-            );
-          } else {
-            pushUndo();
-            state.sections = state.sections.filter(s => s.id !== section.id);
-            saveData(); render();
-          }
-        }}, "✕"));
-        // Add Hauptschritt to this section
-        secBtns.appendChild(h("button", {className:"add-step-btn", title:"Hauptschritt hinzufügen", onClick:() => showModal({
-          title: "Neuer Hauptschritt in \"" + section.name + "\"",
-          value: "",
-          onConfirm: (val) => {
-            if(val.trim()) {
-              pushUndo();
-              state.steps.push({id:"s_"+uid(), name:val.trim(), repeatable:false, sectionId:section.id, substeps:[]});
-              saveData(); render();
-            }
-          }
-        })}, "+ Schritt"));
-        secLabel.appendChild(secBtns);
-      }
-    } else {
-      secLabel.appendChild(h("span", null, section.name));
-    }
-    secLabel.appendChild(h("span", {style:{fontSize:"9px",color:"var(--textFaint)"}}, sectionSteps.length + " Schritte"));
-    secTd.appendChild(secLabel);
-    secRow.appendChild(secTd);
+    // Per-construction status dot
+    state.constructions.forEach(con=>{
+      const st=getSectionStatus(sec.id,con.id);
+      const td=h("td",{className:"section-cell"});
+      if(st!=="none")td.appendChild(h("span",{className:"dot "+st}));
+      secRow.appendChild(td);
+    });
+    if(state.editMode)secRow.appendChild(h("td",null));
     tbody.appendChild(secRow);
 
-    if(!isCollapsedSection) {
-      sectionSteps.forEach((step, si) => renderStepRows(tbody, step, si, sectionSteps));
-    }
+    if(!isCol)secSteps.forEach((step,i)=>renderStepRows(tbody,step,i,secSteps));
   });
 
-  // Unsorted steps
-  if(unsortedSteps.length > 0 || state.editMode) {
-    if(sections.length > 0) {
-      const secRow = h("tr", {className:"section-row"});
-      const secTd = h("td", {className:"indent-section", colSpan: state.constructions.length + 1 + (state.editMode?1:0)});
-      const secLabel = h("div", {className:"section-label"});
-      secLabel.appendChild(h("span", null, "Ohne Abschnitt"));
-      if(state.editMode) {
-        secLabel.appendChild(h("button", {className:"add-step-btn", title:"Hauptschritt hinzufügen", onClick:() => showModal({
-          title: "Neuer Hauptschritt (ohne Abschnitt)",
-          value: "",
-          onConfirm: (val) => {
-            if(val.trim()) {
-              pushUndo();
-              state.steps.push({id:"s_"+uid(), name:val.trim(), repeatable:false, sectionId:"", substeps:[]});
-              saveData(); render();
-            }
-          }
-        })}, "+ Schritt"));
-      }
-      secTd.appendChild(secLabel);
-      secRow.appendChild(secTd);
-      tbody.appendChild(secRow);
+  if(unsorted.length||state.editMode){
+    if(sections.length){
+      const sr=h("tr",{className:"section-row"});
+      const std=h("td",{className:"indent-section"});
+      const sl=h("div",{className:"section-label"});
+      sl.appendChild(h("span",null,"Ohne Abschnitt"));
+      if(state.editMode)sl.appendChild(h("button",{className:"add-step-btn",onClick:()=>showModal({title:"Neuer Hauptschritt (ohne Abschnitt)",value:"",onConfirm:val=>{if(val.trim()){pushUndo();state.steps.push({id:"s_"+uid(),name:val.trim(),repeatable:false,sectionId:"",substeps:[]});saveData();render();}}})},"+ Schritt"));
+      std.appendChild(sl);sr.appendChild(std);
+      state.constructions.forEach(()=>sr.appendChild(h("td",{className:"section-cell"})));
+      if(state.editMode)sr.appendChild(h("td",null));
+      tbody.appendChild(sr);
     }
-    unsortedSteps.forEach((step, si) => renderStepRows(tbody, step, si, unsortedSteps));
+    unsorted.forEach((step,i)=>renderStepRows(tbody,step,i,unsorted));
   }
 
-  table.appendChild(tbody);
-  wrapper.appendChild(table);
-  frag.appendChild(wrapper);
+  table.appendChild(tbody);wrapper.appendChild(table);frag.appendChild(wrapper);
 
-  // Team management
-  if(state.editMode) {
-    const tb = h("div", {className:"team-bar"});
-    tb.appendChild(h("div", {style:{fontWeight:"600",marginBottom:"8px",color:"var(--textStrong)",fontSize:"12px"}}, "Team"));
-    const tw = h("div", {style:{display:"flex",gap:"6px",flexWrap:"wrap",alignItems:"center"}});
-    state.team.forEach(t => {
-      tw.appendChild(h("span", {className:"team-tag"}, t,
-        h("button", {className:"btn-edit danger", style:{fontSize:"9px"}, onClick:() => {
-          pushUndo();
-          state.team = state.team.filter(x => x !== t);
-          saveData(); render();
-        }}, "✕")
-      ));
-    });
-    tw.appendChild(h("button", {className:"btn-sm", onClick:() => showModal({
-      title: "Neues Teammitglied",
-      value: "",
-      onConfirm: (val) => { if(val.trim()) { pushUndo(); state.team.push(val.trim()); saveData(); render(); } }
-    })}, "+ Person"));
-    tb.appendChild(tw);
-    frag.appendChild(tb);
+  if(state.editMode){
+    const tb=h("div",{className:"team-bar"});
+    tb.appendChild(h("div",{style:{fontWeight:"600",marginBottom:"8px",color:"var(--textStrong)",fontSize:"12px"}},"Team"));
+    const tw=h("div",{style:{display:"flex",gap:"6px",flexWrap:"wrap",alignItems:"center"}});
+    state.team.forEach(t=>tw.appendChild(h("span",{className:"team-tag"},t,h("button",{className:"btn-edit danger",style:{fontSize:"9px"},onClick:()=>{pushUndo();state.team=state.team.filter(x=>x!==t);saveData();render();}},"✕"))));
+    tw.appendChild(h("button",{className:"btn-sm",onClick:()=>showModal({title:"Neues Teammitglied",value:"",onConfirm:val=>{if(val.trim()){pushUndo();state.team.push(val.trim());saveData();render();}}})},"+ Person"));
+    tb.appendChild(tw);frag.appendChild(tb);
   }
-
   return frag;
 }
 
-function renderStepRows(tbody, step, si, stepsInScope) {
-  const hasSubs = step.substeps && step.substeps.length > 0;
-  const isCollapsed = state.collapsed[step.id];
+function renderStepRows(tbody,step,si,scope){
+  const hasSubs=step.substeps&&step.substeps.length>0;
+  const isCol=state.collapsed[step.id];
+  const tr=h("tr",null);
+  const tdN=h("td",{className:"step-main indent-main"});
+  const nd=h("div",{style:{display:"flex",alignItems:"center",gap:"5px"}});
+  if(hasSubs)nd.appendChild(h("button",{className:"collapse-toggle"+(isCol?" collapsed":""),onClick:()=>{state.collapsed[step.id]=!state.collapsed[step.id];render();}},"▼"));
+  else nd.appendChild(h("span",{style:{width:"16px",display:"inline-block"}}));
+  if(step.repeatable)nd.appendChild(h("span",{className:"repeat-badge"},"↻"));
+  nd.appendChild(h("span",{style:{flex:"1",cursor:state.editMode?"pointer":"default"},onClick:()=>{if(state.editMode)showModal({title:"Schritt umbenennen",value:step.name,onConfirm:val=>{if(val.trim()){pushUndo();step.name=val.trim();saveData();render();}}});}},step.name));
 
-  // Main row
-  const tr = h("tr", null);
-  const tdName = h("td", {className:"step-main indent-main"});
-  const nameDiv = h("div", {style:{display:"flex",alignItems:"center",gap:"5px"}});
-
-  // Collapse toggle
-  if(hasSubs) {
-    nameDiv.appendChild(h("button", {className:"collapse-toggle"+(isCollapsed?" collapsed":""), onClick:() => {
-      state.collapsed[step.id] = !state.collapsed[step.id];
-      render();
-    }}, "▼"));
-  } else {
-    nameDiv.appendChild(h("span", {style:{width:"16px",display:"inline-block"}}));
-  }
-
-  if(step.repeatable) nameDiv.appendChild(h("span", {className:"repeat-badge"}, "↻"));
-
-  // Step name
-  if(state.editMode) {
-    if (state.renaming && state.renaming.type === "step" && state.renaming.id === step.id) {
-      nameDiv.appendChild(renderRenameInput(step.id, step.name));
-    } else {
-      nameDiv.appendChild(h("span", {style:{flex:"1",cursor:"pointer"}, onClick:() => startRenaming("step", step.id)}, step.name));
+  if(state.editMode){
+    const btns=h("span",{style:{display:"flex",gap:"1px",flexShrink:"0"}});
+    if(si>0)btns.appendChild(h("button",{className:"btn-edit",onClick:()=>{pushUndo();const gi=state.steps.indexOf(step);const prev=scope[scope.indexOf(step)-1];const pgi=state.steps.indexOf(prev);state.steps.splice(gi,1);state.steps.splice(pgi,0,step);saveData();render();}},"▲"));
+    if(si<scope.length-1)btns.appendChild(h("button",{className:"btn-edit",onClick:()=>{pushUndo();const gi=state.steps.indexOf(step);const next=scope[scope.indexOf(step)+1];const ngi=state.steps.indexOf(next);state.steps.splice(gi,1);state.steps.splice(ngi,0,step);saveData();render();}},"▼"));
+    btns.appendChild(h("button",{className:"btn-edit",title:"Umbenennen",onClick:()=>showModal({title:"Schritt umbenennen",value:step.name,onConfirm:val=>{if(val.trim()){pushUndo();step.name=val.trim();saveData();render();}}})},"✎"));
+    btns.appendChild(h("button",{className:"btn-edit",title:"Duplizieren",onClick:()=>duplicateStep(step)},"⧉"));
+    btns.appendChild(h("button",{className:"btn-edit",title:"Unterschritt hinzufügen",onClick:()=>showModal({title:"Neuer Unterschritt",value:"",onConfirm:val=>{if(val.trim()){pushUndo();if(!step.substeps)step.substeps=[];step.substeps.push({id:"ss_"+uid(),name:val.trim()});saveData();render();}}})},"＋"));
+    if((state.sections||[]).length){
+      const sel=h("select",{style:{fontSize:"9px",padding:"1px 2px",background:"var(--bg)",border:"1px solid var(--border)",borderRadius:"3px",color:"var(--textMuted)",fontFamily:"inherit",cursor:"pointer"},onChange:e=>{pushUndo();step.sectionId=e.target.value;saveData();render();}});
+      sel.appendChild(h("option",{value:""},"—"));
+      (state.sections||[]).forEach(sec=>{const opt=h("option",{value:sec.id},sec.name);if(step.sectionId===sec.id)opt.selected=true;sel.appendChild(opt);});
+      btns.appendChild(sel);
     }
-  } else {
-    nameDiv.appendChild(h("span", {style:{flex:"1"}}, step.name));
+    btns.appendChild(h("button",{className:"btn-edit danger",onClick:()=>{
+      if(hasSubs)confirmDelete("Hauptschritt löschen?","\""+step.name+"\" enthält "+step.substeps.length+" Unterschritt(e).",()=>{pushUndo();state.steps=state.steps.filter(s=>s.id!==step.id);saveData();render();});
+      else{pushUndo();state.steps=state.steps.filter(s=>s.id!==step.id);saveData();render();}
+    }},"✕"));
+    nd.appendChild(btns);
   }
+  tdN.appendChild(nd);tr.appendChild(tdN);
 
-  if(state.editMode && !(state.renaming && state.renaming.type === "step" && state.renaming.id === step.id)) {
-    const btns = h("span", {style:{display:"flex",gap:"1px",flexShrink:"0"}});
-    // Move up/down
-    if(si > 0) btns.appendChild(h("button", {className:"btn-edit", onClick:() => {
-      pushUndo();
-      const idx = stepsInScope.indexOf(step);
-      const globalIdx = state.steps.indexOf(step);
-      const prevStep = stepsInScope[idx-1];
-      const prevGlobalIdx = state.steps.indexOf(prevStep);
-      state.steps.splice(globalIdx, 1);
-      state.steps.splice(prevGlobalIdx, 0, step);
-      saveData(); render();
-    }}, "▲"));
-    if(si < stepsInScope.length-1) btns.appendChild(h("button", {className:"btn-edit", onClick:() => {
-      pushUndo();
-      const idx = stepsInScope.indexOf(step);
-      const globalIdx = state.steps.indexOf(step);
-      const nextStep = stepsInScope[idx+1];
-      const nextGlobalIdx = state.steps.indexOf(nextStep);
-      state.steps.splice(globalIdx, 1);
-      state.steps.splice(nextGlobalIdx, 0, step);
-      saveData(); render();
-    }}, "▼"));
-    btns.appendChild(h("button", {className:"btn-edit", title:"Umbenennen", onClick:() => startRenaming("step", step.id)}, "✎"));
-    btns.appendChild(h("button", {className:"btn-edit", title:"Duplizieren", onClick:() => duplicateStep(step)}, "⧉"));
-    // Add substep
-    btns.appendChild(h("button", {className:"btn-edit", title:"Unterschritt hinzufügen", onClick:() => showModal({
-      title: "Neuer Unterschritt",
-      value: "",
-      onConfirm: (val) => { if(val.trim()) { pushUndo(); if(!step.substeps) step.substeps=[]; step.substeps.push({id:"ss_"+uid(), name:val.trim()}); saveData(); render(); } }
-    })}, "+"));
-    // Section assignment
-    if((state.sections||[]).length > 0) {
-      const secSelect = h("select", {style:{fontSize:"9px",padding:"1px 2px",background:"var(--bg)",border:"1px solid var(--border)",borderRadius:"3px",color:"var(--textMuted)",fontFamily:"inherit",cursor:"pointer"},
-        onChange:e => { pushUndo(); step.sectionId = e.target.value; saveData(); render(); }
-      });
-      secSelect.appendChild(h("option", {value:""}, "—"));
-      (state.sections||[]).forEach(sec => {
-        const opt = h("option", {value:sec.id}, sec.name);
-        if(step.sectionId === sec.id) opt.selected = true;
-        secSelect.appendChild(opt);
-      });
-      btns.appendChild(secSelect);
-    }
-    // Delete
-    btns.appendChild(h("button", {className:"btn-edit danger", onClick:() => {
-      if (hasSubs) {
-        confirmDelete(
-          "Hauptschritt löschen?",
-          "\"" + step.name + "\" enthält " + step.substeps.length + " Unterschritt(e). Alles wird gelöscht.",
-          () => {
-            pushUndo();
-            state.steps = state.steps.filter(s => s.id !== step.id);
-            saveData(); render();
-          }
-        );
-      } else {
-        pushUndo();
-        state.steps = state.steps.filter(s => s.id !== step.id);
-        saveData(); render();
-      }
-    }}, "✕"));
-    nameDiv.appendChild(btns);
-  }
-  tdName.appendChild(nameDiv);
-  tr.appendChild(tdName);
-
-  // Cells for main step
-  state.constructions.forEach(con => {
-    if(hasSubs) {
-      const cells = step.substeps.map(ss => getCell(con.id, ss.id));
-      const st = cells.every(c => c.status==="done") ? "done"
-        : cells.some(c => c.status==="blocked") ? "blocked"
-        : cells.some(c => c.status==="active") ? "active"
-        : cells.some(c => c.status==="review") ? "review"
-        : cells.some(c => c.status==="kommt") ? "kommt"
-        : "none";
-      tr.appendChild(h("td", {className:"cell-main"}, st !== "none" ? h("span", {className:"dot "+st}) : document.createTextNode("")));
-    } else {
-      tr.appendChild(renderCell(con.id, step.id));
-    }
+  state.constructions.forEach(con=>{
+    if(hasSubs){
+      const cells=step.substeps.map(ss=>getCell(con.id,ss.id));
+      const st=cells.every(c=>c.status==="done")?"done":cells.some(c=>c.status==="blocked")?"blocked":cells.some(c=>c.status==="active")?"active":cells.some(c=>c.status==="review")?"review":cells.some(c=>c.status==="kommt")?"kommt":"none";
+      tr.appendChild(h("td",{className:"cell-main"},st!=="none"?h("span",{className:"dot "+st}):document.createTextNode("")));
+    }else tr.appendChild(renderCell(con.id,step.id));
   });
-  if(state.editMode) tr.appendChild(h("td", null));
+  if(state.editMode)tr.appendChild(h("td",null));
   tbody.appendChild(tr);
 
-  // Substep rows
-  if(hasSubs && !isCollapsed) {
-    step.substeps.forEach((sub, ssi) => {
-      const str = h("tr", null);
-      const stdName = h("td", {className:"step-sub indent-sub"});
-      const sdiv = h("div", {style:{display:"flex",alignItems:"center",gap:"3px"}});
-      sdiv.appendChild(h("span", {className:"sub-arrow"}, "└"));
-
-      if(state.editMode) {
-        if (state.renaming && state.renaming.type === "substep" && state.renaming.id === sub.id) {
-          sdiv.appendChild(renderRenameInput(sub.id, sub.name));
-        } else {
-          sdiv.appendChild(h("span", {style:{flex:"1",cursor:"pointer"}, onClick:() => startRenaming("substep", sub.id, step.id)}, sub.name));
-          const sbtns = h("span", {style:{display:"flex",gap:"1px",flexShrink:"0"}});
-          if(ssi > 0) sbtns.appendChild(h("button", {className:"btn-edit", onClick:() => {
-            pushUndo();
-            [step.substeps[ssi], step.substeps[ssi-1]] = [step.substeps[ssi-1], step.substeps[ssi]];
-            saveData(); render();
-          }}, "▲"));
-          if(ssi < step.substeps.length-1) sbtns.appendChild(h("button", {className:"btn-edit", onClick:() => {
-            pushUndo();
-            [step.substeps[ssi], step.substeps[ssi+1]] = [step.substeps[ssi+1], step.substeps[ssi]];
-            saveData(); render();
-          }}, "▼"));
-          sbtns.appendChild(h("button", {className:"btn-edit", title:"Umbenennen", onClick:() => startRenaming("substep", sub.id, step.id)}, "✎"));
-          sbtns.appendChild(h("button", {className:"btn-edit", title:"Duplizieren", onClick:() => duplicateSubstep(step, sub)}, "⧉"));
-          sbtns.appendChild(h("button", {className:"btn-edit danger", onClick:() => {
-            pushUndo();
-            step.substeps = step.substeps.filter(ss => ss.id !== sub.id);
-            saveData(); render();
-          }}, "✕"));
-          sdiv.appendChild(sbtns);
-        }
-      } else {
-        sdiv.appendChild(h("span", {style:{flex:"1"}}, sub.name));
+  if(hasSubs&&!isCol){
+    step.substeps.forEach((sub,ssi)=>{
+      const str=h("tr",null);
+      const sn=h("td",{className:"step-sub indent-sub"});
+      const sd=h("div",{style:{display:"flex",alignItems:"center",gap:"3px"}});
+      sd.appendChild(h("span",{className:"sub-arrow"},"└"));
+      sd.appendChild(h("span",{style:{flex:"1",cursor:state.editMode?"pointer":"default"},onClick:()=>{if(state.editMode)showModal({title:"Unterschritt umbenennen",value:sub.name,onConfirm:val=>{if(val.trim()){pushUndo();sub.name=val.trim();saveData();render();}}});}},sub.name));
+      if(state.editMode){
+        const sb=h("span",{style:{display:"flex",gap:"1px",flexShrink:"0"}});
+        if(ssi>0)sb.appendChild(h("button",{className:"btn-edit",onClick:()=>{pushUndo();[step.substeps[ssi],step.substeps[ssi-1]]=[step.substeps[ssi-1],step.substeps[ssi]];saveData();render();}},"▲"));
+        if(ssi<step.substeps.length-1)sb.appendChild(h("button",{className:"btn-edit",onClick:()=>{pushUndo();[step.substeps[ssi],step.substeps[ssi+1]]=[step.substeps[ssi+1],step.substeps[ssi]];saveData();render();}},"▼"));
+        sb.appendChild(h("button",{className:"btn-edit",title:"Umbenennen",onClick:()=>showModal({title:"Unterschritt umbenennen",value:sub.name,onConfirm:val=>{if(val.trim()){pushUndo();sub.name=val.trim();saveData();render();}}})},"✎"));
+        sb.appendChild(h("button",{className:"btn-edit",title:"Duplizieren",onClick:()=>duplicateSubstep(step,sub)},"⧉"));
+        sb.appendChild(h("button",{className:"btn-edit danger",onClick:()=>{pushUndo();step.substeps=step.substeps.filter(ss=>ss.id!==sub.id);saveData();render();}},"✕"));
+        sd.appendChild(sb);
       }
-      stdName.appendChild(sdiv);
-      str.appendChild(stdName);
-
-      state.constructions.forEach(con => {
-        str.appendChild(renderCell(con.id, sub.id));
-      });
-      if(state.editMode) str.appendChild(h("td", null));
+      sn.appendChild(sd);str.appendChild(sn);
+      state.constructions.forEach(con=>str.appendChild(renderCell(con.id,sub.id)));
+      if(state.editMode)str.appendChild(h("td",null));
       tbody.appendChild(str);
     });
   }
 }
 
-function renderCell(cid, sid) {
-  const cell = getCell(cid, sid);
-  const cellKey = ck(cid, sid);
-  const td = h("td", {className:"cell", onClick: e => {
-    e.stopPropagation();
-    state.activeCell = state.activeCell === cellKey ? null : cellKey;
-    render();
-  }});
-
-  const chipEl = renderChip(cell);
-  td.appendChild(chipEl);
-
-  if(state.activeCell === cellKey) {
-    td.appendChild(renderPopup(cid, sid, cell));
-  }
-
+function renderCell(cid,sid){
+  const cell=getCell(cid,sid),cellKey=ck(cid,sid);
+  const td=h("td",{className:"cell",onClick:e=>{e.stopPropagation();state.activeCell=state.activeCell===cellKey?null:cellKey;render();}});
+  td.appendChild(renderChip(cell));
+  if(state.activeCell===cellKey)td.appendChild(renderPopup(cid,sid,cell));
   return td;
 }
 
-function renderChip(cell) {
-  if(cell.status==="none") return h("span", {style:{color:"var(--none-text)"}}, "·");
-  return h("span", {className:"chip "+cell.status}, cell.person || STATUS_LABELS[cell.status]);
+function renderChip(cell){
+  if(cell.status==="none")return h("span",{style:{color:"var(--none-text)"}},"·");
+  return h("span",{className:"chip "+cell.status},cell.person||STATUS_LABELS[cell.status]);
 }
 
-function renderPopup(cid, sid, cell) {
-  const pop = h("div", {className:"popup", onClick:e => e.stopPropagation()});
-
-  // STATUS
-  pop.appendChild(h("div", {className:"popup-label"}, "STATUS"));
-  const sg = h("div", {style:{marginBottom:"8px"}});
-  Object.entries(STATUS_LABELS).forEach(([k,v]) => {
-    const btn = h("button", {
-      className:"popup-btn"+(cell.status===k?" selected":""),
-      style:{color:"var(--"+k+"-text)", background:cell.status===k?"var(--"+k+"-bg)":"transparent", borderColor:cell.status===k?"var(--"+k+"-border)":"var(--border)"},
-      onClick:() => setCell(cid, sid, {...cell, status:k})
-    }, v);
-    sg.appendChild(btn);
-  });
+function renderPopup(cid,sid,cell){
+  const pop=h("div",{className:"popup",onClick:e=>e.stopPropagation()});
+  pop.appendChild(h("div",{className:"popup-label"},"STATUS"));
+  const sg=h("div",{style:{marginBottom:"8px"}});
+  Object.entries(STATUS_LABELS).forEach(([k,v])=>{sg.appendChild(h("button",{className:"popup-btn"+(cell.status===k?" selected":""),style:{color:"var(--"+k+"-text)",background:cell.status===k?"var(--"+k+"-bg)":"transparent",borderColor:cell.status===k?"var(--"+k+"-border)":"var(--border)"},onClick:()=>setCell(cid,sid,{...cell,status:k})},v));});
   pop.appendChild(sg);
-
-  // PERSON
-  pop.appendChild(h("div", {className:"popup-label"}, "PERSON"));
-  const suggested = getSuggestedPerson(sid, cid);
-  const pg = h("div", {style:{display:"flex",flexWrap:"wrap",gap:"3px"}});
-  pg.appendChild(h("button", {className:"popup-person"+(!cell.person?" selected":""), onClick:() => setCell(cid, sid, {...cell, person:""})}, "—"));
-  state.team.forEach(t => {
-    const isSuggested = (t === suggested && !cell.person);
-    const cls = "popup-person" + (cell.person===t ? " selected" : "") + (isSuggested ? " suggested" : "");
-    const btn = h("button", {className:cls, onClick:() => setCell(cid, sid, {...cell, person:t})}, t);
-    if(isSuggested) btn.title = "Vorschlag: In anderen Konstruktionen zugewiesen";
-    pg.appendChild(btn);
-  });
+  pop.appendChild(h("div",{className:"popup-label"},"PERSON"));
+  const sugg=getSuggestedPerson(sid,cid);
+  const pg=h("div",{style:{display:"flex",flexWrap:"wrap",gap:"3px"}});
+  pg.appendChild(h("button",{className:"popup-person"+(!cell.person?" selected":""),onClick:()=>setCell(cid,sid,{...cell,person:""})},"—"));
+  state.team.forEach(t=>{const isSugg=t===sugg&&!cell.person;pg.appendChild(h("button",{className:"popup-person"+(cell.person===t?" selected":"")+(isSugg?" suggested":""),title:isSugg?"Vorschlag":"",onClick:()=>setCell(cid,sid,{...cell,person:t})},t));});
   pop.appendChild(pg);
-
-  if(suggested && !cell.person) {
-    pop.appendChild(h("div", {style:{fontSize:"9px",color:"var(--review-text)",marginTop:"4px"}}, "💡 Vorschlag: " + suggested));
-  }
-
+  if(sugg&&!cell.person)pop.appendChild(h("div",{style:{fontSize:"9px",color:"var(--review-text)",marginTop:"4px"}},"💡 Vorschlag: "+sugg));
   return pop;
 }
 
 // ─── Dashboard ───
-function renderDashboard() {
-  const frag = document.createDocumentFragment();
-  frag.appendChild(h("h2", {className:"section-title"}, "Projekt-Übersicht"));
-  const grid = h("div", {className:"card-grid", style:{marginBottom:"28px"}});
-  state.constructions.forEach(con => {
-    const p = getProgress(con.id);
-    const card = h("div", {className:"card"},
-      h("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}},
-        h("span", {style:{fontWeight:"700",fontSize:"14px",color:"var(--textStrong)"}}, con.name),
-        h("span", {style:{fontSize:"20px",fontWeight:"800",color:p.pct===100?"var(--done-text)":"var(--active-text)"}}, p.pct+"%")
-      ),
-      h("div", {className:"progress-bar"}, h("div", {className:"progress-fill", style:{width:p.pct+"%",background:p.pct===100?"var(--done-text)":p.pct>50?"var(--active-text)":"var(--review-text)"}}))
-    );
-    const stats = h("div", {style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px",marginTop:"12px",fontSize:"11px"}});
-    [["Erledigt",p.done,"done"],["In Arbeit",p.active,"active"],["Blockiert",p.blocked,"blocked"],["Review",p.review,"review"]].forEach(([l,v,k]) => {
-      stats.appendChild(h("div", {style:{display:"flex",justifyContent:"space-between"}},
-        h("span", {style:{color:"var(--textMuted)"}}, l),
-        h("span", {style:{color:"var(--"+k+"-text)",fontWeight:"600"}}, v+"/"+p.total)
-      ));
-    });
-    card.appendChild(stats);
-    grid.appendChild(card);
+function renderDashboard(){
+  const frag=document.createDocumentFragment();
+  frag.appendChild(h("h2",{className:"section-title"},"Projekt-Übersicht"));
+  const grid=h("div",{className:"card-grid",style:{marginBottom:"28px"}});
+  state.constructions.forEach(con=>{
+    const p=getProgress(con.id);
+    const card=h("div",{className:"card"},
+      h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}},h("span",{style:{fontWeight:"700",fontSize:"14px",color:"var(--textStrong)"}},con.name),h("span",{style:{fontSize:"20px",fontWeight:"800",color:p.pct===100?"var(--done-text)":"var(--active-text)"}},p.pct+"%")),
+      h("div",{className:"progress-bar"},h("div",{className:"progress-fill",style:{width:p.pct+"%",background:p.pct===100?"var(--done-text)":p.pct>50?"var(--active-text)":"var(--review-text)"}})));
+    const stats=h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px",marginTop:"12px",fontSize:"11px"}});
+    [["Erledigt",p.done,"done"],["In Arbeit",p.active,"active"],["Blockiert",p.blocked,"blocked"],["Review",p.review,"review"]].forEach(([l,v,k])=>{stats.appendChild(h("div",{style:{display:"flex",justifyContent:"space-between"}},h("span",{style:{color:"var(--textMuted)"}},l),h("span",{style:{color:"var(--"+k+"-text)",fontWeight:"600"}},v+"/"+p.total)));});
+    card.appendChild(stats);grid.appendChild(card);
   });
   frag.appendChild(grid);
-
-  frag.appendChild(h("h2", {className:"section-title"}, "Nächste Schritte"));
-  const nexts = [];
-  state.constructions.forEach(con => {
-    getAllIds(state.steps).forEach(sid => {
-      const c = getCell(con.id, sid);
-      if(["active","blocked","review"].includes(c.status)) {
-        nexts.push({con:con.name, step:findName(sid), status:c.status, person:c.person});
-      }
-    });
-  });
-  if(!nexts.length) frag.appendChild(h("div", {style:{color:"var(--textMuted)",padding:"14px"}}, "Keine offenen Aufgaben."));
-  else nexts.forEach(ns => {
-    const row = h("div", {className:"next-row"},
-      h("span", {className:"dot "+ns.status}),
-      h("span", {style:{fontWeight:"600",color:"var(--textStrong)",minWidth:"70px"}}, ns.con),
-      h("span", {style:{color:"var(--textMuted)",flex:"1"}}, ns.step)
-    );
-    if(ns.person) row.appendChild(h("span", {style:{padding:"2px 7px",background:"var(--accent)",border:"1px solid var(--borderStrong)",borderRadius:"4px",fontSize:"10px"}}, ns.person));
-    row.appendChild(h("span", {style:{fontSize:"10px",color:"var(--"+ns.status+"-text)"}}, STATUS_LABELS[ns.status]));
-    frag.appendChild(row);
+  frag.appendChild(h("h2",{className:"section-title"},"Nächste Schritte"));
+  const nexts=[];
+  state.constructions.forEach(con=>{getAllIds(state.steps).forEach(sid=>{const c=getCell(con.id,sid);if(["active","blocked","review"].includes(c.status))nexts.push({con:con.name,step:findName(sid),status:c.status,person:c.person});});});
+  if(!nexts.length)frag.appendChild(h("div",{style:{color:"var(--textMuted)",padding:"14px"}},"Keine offenen Aufgaben."));
+  else nexts.forEach(ns=>{
+    const row=h("div",{className:"next-row"},h("span",{className:"dot "+ns.status}),h("span",{style:{fontWeight:"600",color:"var(--textStrong)",minWidth:"70px"}},ns.con),h("span",{style:{color:"var(--textMuted)",flex:"1"}},ns.step));
+    if(ns.person)row.appendChild(h("span",{style:{padding:"2px 7px",background:"var(--accent)",border:"1px solid var(--borderStrong)",borderRadius:"4px",fontSize:"10px"}},ns.person));
+    row.appendChild(h("span",{style:{fontSize:"10px",color:"var(--"+ns.status+"-text)"}},STATUS_LABELS[ns.status]));frag.appendChild(row);
   });
   return frag;
 }
 
 // ─── Tasks ───
-function renderTasks() {
-  const frag = document.createDocumentFragment();
-  frag.appendChild(h("h2", {className:"section-title"}, "Aufgaben pro Person"));
-
-  const tasks = {};
-  const unassigned = [];
-  state.team.forEach(p => tasks[p] = []);
-
-  state.constructions.forEach(con => {
-    getAllIds(state.steps).forEach(sid => {
-      const c = getCell(con.id, sid);
-      // Exclude "done", "none", and "kommt" from tasks
-      if(["done","none","kommt"].includes(c.status)) return;
-      if(c.person) {
-        if(!tasks[c.person]) tasks[c.person] = [];
-        tasks[c.person].push({con:con.name, step:findName(sid), status:c.status});
-      } else {
-        unassigned.push({con:con.name, step:findName(sid), status:c.status});
-      }
-    });
-  });
-
-  const grid = h("div", {className:"card-grid"});
-
-  // Unassigned card
-  if(unassigned.length > 0) {
-    const card = h("div", {className:"card", style:{borderColor:"var(--blocked-border)"}},
-      h("div", {style:{fontWeight:"700",fontSize:"13px",color:"var(--blocked-text)",marginBottom:"10px",display:"flex",justifyContent:"space-between",alignItems:"center"}},
-        h("span", null, "Nicht zugewiesen"),
-        h("span", {style:{fontSize:"10px",padding:"2px 7px",background:"var(--blocked-bg)",borderRadius:"10px",color:"var(--blocked-text)"}}, unassigned.length + " offen")
-      )
-    );
-    const list = h("div", {style:{display:"grid",gap:"5px"}});
-    unassigned.forEach(t => {
-      list.appendChild(h("div", {style:{padding:"7px 9px",background:"var(--bg)",borderRadius:"4px",border:"1px solid var(--"+t.status+"-border)",display:"flex",alignItems:"center",gap:"7px"}},
-        h("span", {className:"dot "+t.status}),
-        h("div", null,
-          h("div", {style:{fontSize:"11px",fontWeight:"600",color:"var(--text)"}}, t.con),
-          h("div", {style:{fontSize:"10px",color:"var(--textMuted)"}}, t.step)
-        )
-      ));
-    });
-    card.appendChild(list);
-    grid.appendChild(card);
+function renderTasks(){
+  const frag=document.createDocumentFragment();
+  frag.appendChild(h("h2",{className:"section-title"},"Aufgaben pro Person"));
+  const tasks={},unassigned=[];state.team.forEach(p=>tasks[p]=[]);
+  state.constructions.forEach(con=>{getAllIds(state.steps).forEach(sid=>{const c=getCell(con.id,sid);if(["done","none","kommt"].includes(c.status))return;if(c.person){if(!tasks[c.person])tasks[c.person]=[];tasks[c.person].push({con:con.name,step:findName(sid),status:c.status});}else unassigned.push({con:con.name,step:findName(sid),status:c.status});});});
+  const grid=h("div",{className:"card-grid"});
+  if(unassigned.length){
+    const card=h("div",{className:"card",style:{borderColor:"var(--blocked-border)"}},h("div",{style:{fontWeight:"700",fontSize:"13px",color:"var(--blocked-text)",marginBottom:"10px",display:"flex",justifyContent:"space-between",alignItems:"center"}},h("span",null,"Nicht zugewiesen"),h("span",{style:{fontSize:"10px",padding:"2px 7px",background:"var(--blocked-bg)",borderRadius:"10px",color:"var(--blocked-text)"}},unassigned.length+" offen")));
+    const list=h("div",{style:{display:"grid",gap:"5px"}});
+    unassigned.forEach(t=>list.appendChild(h("div",{style:{padding:"7px 9px",background:"var(--bg)",borderRadius:"4px",border:"1px solid var(--"+t.status+"-border)",display:"flex",alignItems:"center",gap:"7px"}},h("span",{className:"dot "+t.status}),h("div",null,h("div",{style:{fontSize:"11px",fontWeight:"600",color:"var(--text)"}},t.con),h("div",{style:{fontSize:"10px",color:"var(--textMuted)"}},t.step)))));
+    card.appendChild(list);grid.appendChild(card);
   }
-
-  // Per-person cards
-  state.team.forEach(person => {
-    const card = h("div", {className:"card"},
-      h("div", {style:{fontWeight:"700",fontSize:"13px",color:"var(--textStrong)",marginBottom:"10px",display:"flex",justifyContent:"space-between",alignItems:"center"}},
-        h("span", null, person),
-        h("span", {style:{fontSize:"10px",padding:"2px 7px",background:"var(--accent)",borderRadius:"10px",color:tasks[person]?.length?"var(--active-text)":"var(--done-text)"}}, (tasks[person]?.length||0)+" offen")
-      )
-    );
-    if(!tasks[person]?.length) card.appendChild(h("div", {style:{color:"var(--textFaint)",fontSize:"11px"}}, "Keine offenen Aufgaben"));
-    else {
-      const list = h("div", {style:{display:"grid",gap:"5px"}});
-      tasks[person].forEach(t => {
-        list.appendChild(h("div", {style:{padding:"7px 9px",background:"var(--bg)",borderRadius:"4px",border:"1px solid var(--"+t.status+"-border)",display:"flex",alignItems:"center",gap:"7px"}},
-          h("span", {className:"dot "+t.status}),
-          h("div", null,
-            h("div", {style:{fontSize:"11px",fontWeight:"600",color:"var(--text)"}}, t.con),
-            h("div", {style:{fontSize:"10px",color:"var(--textMuted)"}}, t.step)
-          )
-        ));
-      });
-      card.appendChild(list);
-    }
+  state.team.forEach(person=>{
+    const card=h("div",{className:"card"},h("div",{style:{fontWeight:"700",fontSize:"13px",color:"var(--textStrong)",marginBottom:"10px",display:"flex",justifyContent:"space-between",alignItems:"center"}},h("span",null,person),h("span",{style:{fontSize:"10px",padding:"2px 7px",background:"var(--accent)",borderRadius:"10px",color:tasks[person]?.length?"var(--active-text)":"var(--done-text)"}},( tasks[person]?.length||0)+" offen")));
+    if(!tasks[person]?.length)card.appendChild(h("div",{style:{color:"var(--textFaint)",fontSize:"11px"}},"Keine offenen Aufgaben"));
+    else{const list=h("div",{style:{display:"grid",gap:"5px"}});tasks[person].forEach(t=>list.appendChild(h("div",{style:{padding:"7px 9px",background:"var(--bg)",borderRadius:"4px",border:"1px solid var(--"+t.status+"-border)",display:"flex",alignItems:"center",gap:"7px"}},h("span",{className:"dot "+t.status}),h("div",null,h("div",{style:{fontSize:"11px",fontWeight:"600",color:"var(--text)"}},t.con),h("div",{style:{fontSize:"10px",color:"var(--textMuted)"}},t.step)))));card.appendChild(list);}
     grid.appendChild(card);
   });
-  frag.appendChild(grid);
-  return frag;
+  frag.appendChild(grid);return frag;
 }
 
-// Close popup on outside click
-document.addEventListener("click", (e) => {
-  if(state.activeCell && !e.target.closest(".popup") && !e.target.closest(".cell") && !e.target.closest(".chip")) {
-    state.activeCell = null;
-    render();
-  }
-});
-
-// Auth listener
-auth.onAuthStateChanged(user => {
-  state.user = user;
-  if (user) loadData();
-  else { if(unsubscribe) unsubscribe(); }
-  render();
-});
+document.addEventListener("click",e=>{if(state.activeCell&&!e.target.closest(".popup")&&!e.target.closest(".cell")&&!e.target.closest(".chip")){state.activeCell=null;render();}});
+auth.onAuthStateChanged(user=>{state.user=user;if(user)loadData();else{if(unsubscribe)unsubscribe();}render();});
 </script>
 </body>
 </html>
