@@ -68,7 +68,7 @@
   .legend { display: flex; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 5px; }
   .legend-swatch { width: 11px; height: 11px; border-radius: 2px; }
-  .table-wrap { overflow-x: auto; position: relative; padding-right: 40px; }
+  .table-wrap { overflow-x: auto; position: relative; padding-right: 20px; }
   table { border-collapse: collapse; width: 100%; min-width: 600px; }
   th { padding: 10px 12px; border-bottom: 2px solid var(--border); color: var(--textMuted); font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; text-align: center; }
   th.left { text-align: left; min-width: 220px; }
@@ -256,6 +256,7 @@ let state = {
 
 let saveTimeout = null;
 let unsubscribe = null;
+let pendingSave = false; // Block onSnapshot during pending saves
 
 // ─── Firebase Sync ───
 function docRef() { return db.collection("tracker").doc("shared"); }
@@ -263,6 +264,8 @@ function docRef() { return db.collection("tracker").doc("shared"); }
 function loadData() {
   if (unsubscribe) unsubscribe();
   unsubscribe = docRef().onSnapshot(snap => {
+    // Skip snapshot updates while a local save is pending
+    if (pendingSave) return;
     if (snap.exists) {
       const d = snap.data();
       if (d.steps) {
@@ -282,6 +285,7 @@ function loadData() {
 
 function saveData() {
   clearTimeout(saveTimeout);
+  pendingSave = true;
   saveTimeout = setTimeout(async () => {
     state.saving = true; render();
     try {
@@ -294,8 +298,9 @@ function saveData() {
         arrows: state.arrows || [],
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedBy: state.user?.displayName || "unknown",
-      }, { merge: true });
+      });
     } catch(e) { console.error("Save error:", e); }
+    pendingSave = false;
     state.saving = false;
     state.showSaved = true; render();
     setTimeout(() => { state.showSaved = false; render(); }, 1500);
@@ -333,6 +338,8 @@ function addBlock(cid, sid) {
 }
 
 function removeBlock(cid, sid, blockIdx) {
+  // Close any open popup
+  state.activeCell = null;
   // Remove block and shift higher indices down
   const count = getCellBlockCount(cid, sid);
   delete state.matrix[ck(cid, sid, blockIdx)];
@@ -1075,15 +1082,12 @@ function drawArrows() {
     arrowData.push({ ai, fCX, tCX, fBot, fTopY, tBot, tTopY, blockRight, lane, down });
   });
 
-  const LANE_BASE = 6;
-  const LANE_GAP = 8;
+  const LANE_BASE = 3;
+  const LANE_GAP = 6;
   const r = 4;
 
   arrowData.forEach(info => {
     const { ai, fCX, tCX, fBot, fTopY, tBot, tTopY, blockRight, lane, down } = info;
-
-    // Routing lane X: just beside the blocks
-    const rx = blockRight + LANE_BASE + lane * LANE_GAP;
 
     let startX, startY, endX, endY;
     if(down) {
@@ -1102,9 +1106,14 @@ function drawArrows() {
 
     let d;
     const stub = 4;
+    const isSameColumn = Math.abs(startX - endX) < 20;
 
-    if(vDist < 6) {
-      // Same row: small U-shape bump
+    if(isSameColumn && vDist >= 6) {
+      // Direct vertical arrow — same column, just go straight down/up
+      d = `M ${startX} ${startY} L ${endX} ${endY}`;
+    } else if(vDist < 6) {
+      // Same row: small U-shape bump routed close to blocks
+      const rx = blockRight + LANE_BASE + lane * LANE_GAP;
       const bump = 12 * dirY;
       d = `M ${startX} ${startY}`
         + ` L ${startX} ${startY + bump}`
@@ -1113,7 +1122,8 @@ function drawArrows() {
         + ` L ${endX} ${endY + bump}`
         + ` L ${endX} ${endY}`;
     } else {
-      // Orthogonal route with rounded corners
+      // Orthogonal route with rounded corners — closer to blocks
+      const rx = blockRight + LANE_BASE + lane * LANE_GAP;
       const s1y = startY + dirY * stub;
       const e1y = endY - dirY * stub;
 
