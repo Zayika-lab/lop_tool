@@ -160,6 +160,17 @@
 
   .edit-btns { display: flex; gap: 1px; flex-shrink: 0; align-items: center; }
 
+  .task-tile { transition: background .15s, border-color .15s, transform .1s; }
+  .task-tile:hover { background: var(--accent) !important; border-color: var(--borderStrong) !important; }
+  .task-tile:active { transform: scale(.98); }
+
+  td.cell.jump-flash, td.cell-main.jump-flash { animation: jumpFlash 1.6s ease-out; }
+  @keyframes jumpFlash {
+    0%   { box-shadow: inset 0 0 0 3px var(--active-text); background: var(--active-bg); }
+    60%  { box-shadow: inset 0 0 0 2px var(--active-border); background: var(--active-bg); }
+    100% { box-shadow: inset 0 0 0 0 transparent; background: transparent; }
+  }
+
   @media (max-width: 640px) {
     .header { padding: 10px 12px; }
     .content { padding: 10px 12px; }
@@ -176,7 +187,7 @@
 const firebaseConfig={apiKey:"AIzaSyDrLP5LF4OmjAkyn6O0o8d6bLqu0VqtDfs",authDomain:"lop-tool.firebaseapp.com",projectId:"lop-tool",storageBucket:"lop-tool.firebasestorage.app",messagingSenderId:"137174368951",appId:"1:137174368951:web:1bdf9e3d7100789f9f4332"};
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(),db=firebase.firestore(),provider=new firebase.auth.GoogleAuthProvider();
-const STATUS_LABELS={none:"—",done:"Erledigt",active:"In Arbeit",warte:"Warte",blocked:"Blockiert",kommt:"Kommt"};
+const STATUS_LABELS={none:"—",kommt:"Kommt",blocked:"Blockiert",warte:"Warte",active:"In Arbeit",done:"Erledigt"};
 const uid=()=>Math.random().toString(36).slice(2,9);
 const DEFAULT_STEPS=[
   {id:"s1",name:"CAD-Anpassungen",repeatable:false,sectionId:"sec1",substeps:[{id:"s1a",name:"Modell"},{id:"s1b",name:"Zeichnung"}]},
@@ -409,7 +420,7 @@ function renderModal(){
 function renderMatrix(){
   const frag=document.createDocumentFragment();
   const legend=h("div",{className:"legend"});
-  ["done","active","warte","blocked","kommt"].forEach(k=>{legend.appendChild(h("div",{className:"legend-item"},h("div",{className:"legend-swatch",style:{background:"var(--"+k+"-bg)",border:"1px solid var(--"+k+"-border)"}}),h("span",{style:{color:"var(--"+k+"-text)",fontSize:"11px"}},STATUS_LABELS[k])));});
+  ["kommt","blocked","warte","active","done"].forEach(k=>{legend.appendChild(h("div",{className:"legend-item"},h("div",{className:"legend-swatch",style:{background:"var(--"+k+"-bg)",border:"1px solid var(--"+k+"-border)"}}),h("span",{style:{color:"var(--"+k+"-text)",fontSize:"11px"}},STATUS_LABELS[k])));});
   frag.appendChild(legend);
 
   const visibleCons=state.constructions.filter(c=>!state.hiddenColumns[c.id]);
@@ -546,7 +557,7 @@ function renderStepRows(tbody,step,si,scope,visibleCons){
   visibleCons.forEach(con=>{
     if(hasSubs){
       const st=getMainStepSummary(step,con.id);
-      tr.appendChild(h("td",{className:"cell-main"},st!=="none"?h("span",{className:"dot "+st}):document.createTextNode("")));
+      tr.appendChild(h("td",{className:"cell-main","data-navkey":ck(con.id,step.id)},st!=="none"?h("span",{className:"dot "+st}):document.createTextNode("")));
     }else tr.appendChild(renderCell(con.id,step.id));
   });
   if(state.editMode)tr.appendChild(h("td",null));
@@ -650,7 +661,7 @@ function renderDashboard(){
       h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}},h("span",{style:{fontWeight:"700",fontSize:"14px",color:"var(--textStrong)"}},con.name),h("span",{style:{fontSize:"20px",fontWeight:"800",color:p.pct===100?"var(--done-text)":"var(--active-text)"}},p.pct+"%")),
       h("div",{className:"progress-bar"},h("div",{className:"progress-fill",style:{width:p.pct+"%",background:p.pct===100?"var(--done-text)":p.pct>50?"var(--active-text)":"var(--blocked-text)"}})));
     const stats=h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px",marginTop:"12px",fontSize:"11px"}});
-    [["Erledigt",p.done,"done"],["In Arbeit",p.active,"active"],["Warte",p.warte,"warte"],["Blockiert",p.blocked,"blocked"]].forEach(([l,v,k])=>{stats.appendChild(h("div",{style:{display:"flex",justifyContent:"space-between"}},h("span",{style:{color:"var(--textMuted)"}},l),h("span",{style:{color:"var(--"+k+"-text)",fontWeight:"600"}},v+"/"+p.total)));;});
+    [["Blockiert",p.blocked,"blocked"],["Warte",p.warte,"warte"],["In Arbeit",p.active,"active"],["Erledigt",p.done,"done"]].forEach(([l,v,k])=>{stats.appendChild(h("div",{style:{display:"flex",justifyContent:"space-between"}},h("span",{style:{color:"var(--textMuted)"}},l),h("span",{style:{color:"var(--"+k+"-text)",fontWeight:"600"}},v+"/"+p.total)));;});
     card.appendChild(stats);grid.appendChild(card);
   });
   frag.appendChild(grid);
@@ -667,36 +678,74 @@ function renderDashboard(){
 }
 
 // ─── Tasks ───
+// Build step/substep IDs in the same order the matrix renders them (sections → steps → substeps, then unsorted)
+function getMatrixOrderedIds(){
+  const ids=[];
+  const sections=state.sections||[];
+  const allSecIds=new Set(sections.map(s=>s.id));
+  const push=(step)=>{ids.push(step.id);(step.substeps||[]).forEach(ss=>ids.push(ss.id));};
+  sections.forEach(sec=>state.steps.filter(s=>s.sectionId===sec.id).forEach(push));
+  state.steps.filter(s=>!s.sectionId||!allSecIds.has(s.sectionId)).forEach(push);
+  return ids;
+}
+
+// Jump from task view (or anywhere) to a specific cell in the matrix
+function jumpToCell(cid,sid){
+  // Expand section + main step that contain this sid
+  for(const step of state.steps){
+    const isMain=step.id===sid;
+    const isSub=(step.substeps||[]).some(ss=>ss.id===sid);
+    if(isMain||isSub){
+      if(step.sectionId)state.collapsedSections[step.sectionId]=false;
+      if(isSub)state.collapsed[step.id]=false;
+      break;
+    }
+  }
+  // Un-hide the construction column if hidden
+  if(state.hiddenColumns&&state.hiddenColumns[cid])state.hiddenColumns[cid]=false;
+  state.view="matrix";
+  render();
+  requestAnimationFrame(()=>{
+    const key=ck(cid,sid);
+    const td=document.querySelector('[data-cellkey="'+key+'"]')||document.querySelector('[data-navkey="'+key+'"]');
+    if(!td)return;
+    td.scrollIntoView({behavior:"smooth",block:"center",inline:"center"});
+    td.classList.add("jump-flash");
+    setTimeout(()=>td.classList.remove("jump-flash"),1600);
+  });
+}
+
 function renderTasks(){
   const frag=document.createDocumentFragment();
   frag.appendChild(h("h2",{className:"section-title"},"Aufgaben pro Person"));
-  // Build ordered list of all step/substep IDs (top to bottom)
-  const orderedIds=getAllIds(state.steps);
-  const idOrder={};orderedIds.forEach((id,i)=>idOrder[id]=i);
-  const conOrder={};state.constructions.forEach((c,i)=>conOrder[c.id]=i);
-  // Collect tasks
+  // Ordered ID list matching the matrix (section-aware), so task order = matrix row order
+  const orderedIds=getMatrixOrderedIds();
+  // Collect tasks: iterate constructions (columns) first, then steps (rows top-to-bottom)
   const tasks={},unassigned=[];state.team.forEach(p=>tasks[p]=[]);
-  // Iterate steps first (top-bottom), then constructions (left-right) for correct order
-  orderedIds.forEach(sid=>{
-    state.constructions.forEach(con=>{
+  state.constructions.forEach(con=>{
+    orderedIds.forEach(sid=>{
       const c=getCell(con.id,sid);
       if(["done","none","kommt"].includes(c.status))return;
-      const entry={con:con.name,step:findName(sid),status:c.status,sidIdx:idOrder[sid]||0,cidIdx:conOrder[con.id]||0};
+      const entry={conId:con.id,sid:sid,con:con.name,step:findName(sid),status:c.status,person:c.person};
       if(c.person){if(!tasks[c.person])tasks[c.person]=[];tasks[c.person].push(entry);}
       else unassigned.push(entry);
     });
   });
+  const makeTile=(t)=>{
+    const tile=h("div",{className:"task-tile",style:{padding:"7px 9px",background:"var(--bg)",borderRadius:"4px",border:"1px solid var(--"+t.status+"-border)",display:"flex",alignItems:"center",gap:"7px",cursor:"pointer"},title:"Zur Aufgabe in der Matrix springen",onClick:()=>jumpToCell(t.conId,t.sid)},h("span",{className:"dot "+t.status}),h("div",{style:{flex:"1",minWidth:"0"}},h("div",{style:{fontSize:"11px",fontWeight:"600",color:"var(--text)"}},t.con),h("div",{style:{fontSize:"10px",color:"var(--textMuted)"}},t.step)));
+    return tile;
+  };
   const grid=h("div",{className:"card-grid"});
   if(unassigned.length){
     const card=h("div",{className:"card",style:{borderColor:"var(--blocked-border)"}},h("div",{style:{fontWeight:"700",fontSize:"13px",color:"var(--blocked-text)",marginBottom:"10px",display:"flex",justifyContent:"space-between",alignItems:"center"}},h("span",null,"Nicht zugewiesen"),h("span",{style:{fontSize:"10px",padding:"2px 7px",background:"var(--blocked-bg)",borderRadius:"10px",color:"var(--blocked-text)"}},unassigned.length+" offen")));
     const list=h("div",{style:{display:"grid",gap:"5px"}});
-    unassigned.forEach(t=>list.appendChild(h("div",{style:{padding:"7px 9px",background:"var(--bg)",borderRadius:"4px",border:"1px solid var(--"+t.status+"-border)",display:"flex",alignItems:"center",gap:"7px"}},h("span",{className:"dot "+t.status}),h("div",null,h("div",{style:{fontSize:"11px",fontWeight:"600",color:"var(--text)"}},t.con),h("div",{style:{fontSize:"10px",color:"var(--textMuted)"}},t.step)))));
+    unassigned.forEach(t=>list.appendChild(makeTile(t)));
     card.appendChild(list);grid.appendChild(card);
   }
   state.team.forEach(person=>{
     const card=h("div",{className:"card"},h("div",{style:{fontWeight:"700",fontSize:"13px",color:"var(--textStrong)",marginBottom:"10px",display:"flex",justifyContent:"space-between",alignItems:"center"}},h("span",null,person),h("span",{style:{fontSize:"10px",padding:"2px 7px",background:"var(--accent)",borderRadius:"10px",color:tasks[person]?.length?"var(--active-text)":"var(--done-text)"}},( tasks[person]?.length||0)+" offen")));
     if(!tasks[person]?.length)card.appendChild(h("div",{style:{color:"var(--textFaint)",fontSize:"11px"}},"Keine offenen Aufgaben"));
-    else{const list=h("div",{style:{display:"grid",gap:"5px"}});tasks[person].forEach(t=>list.appendChild(h("div",{style:{padding:"7px 9px",background:"var(--bg)",borderRadius:"4px",border:"1px solid var(--"+t.status+"-border)",display:"flex",alignItems:"center",gap:"7px"}},h("span",{className:"dot "+t.status}),h("div",null,h("div",{style:{fontSize:"11px",fontWeight:"600",color:"var(--text)"}},t.con),h("div",{style:{fontSize:"10px",color:"var(--textMuted)"}},t.step)))));card.appendChild(list);}
+    else{const list=h("div",{style:{display:"grid",gap:"5px"}});tasks[person].forEach(t=>list.appendChild(makeTile(t)));card.appendChild(list);}
     grid.appendChild(card);
   });
   frag.appendChild(grid);return frag;
